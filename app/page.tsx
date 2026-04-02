@@ -120,7 +120,7 @@ export default function Home() {
     <>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[500px] md:h-[600px] bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 overflow-hidden">
+        <section className="relative h-[500px] md:h-[600px] bg-[url('/images/flooringplaceholder.jpg')] bg-center bg-cover overflow-hidden">
           <div className="absolute inset-0 opacity-20">
             <div className="absolute top-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-400 rounded-full blur-3xl"></div>
@@ -128,17 +128,17 @@ export default function Home() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
             <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
                 Premium Flooring for Your Dream Home
               </h1>
-              <p className="text-xl text-blue-100 mb-8 max-w-xl">
+              <p className="text-xl text-gray-600 mb-8 max-w-xl">
                 Discover Australia's best selection of engineered, hybrid, laminate, and solid flooring with expert guidance and fast delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2">
+                <button className="px-8 py-4 bg-white text-[#0B6A6A] font-semibold rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2">
                   Shop Now →
                 </button>
-                <button className="px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition border border-blue-500">
+                <button className="px-8 py-4 bg-[#109494] text-white font-semibold rounded-lg hover:bg-[#074141] transition border border-blue-500">
                   View Styles
                 </button>
               </div>
@@ -151,19 +151,19 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">100+</div>
+                <div className="text-3xl font-bold text-[#0B6A6A] mb-2">100+</div>
                 <p className="text-gray-600">Products</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">⭐ 4.9</div>
+                <div className="text-3xl font-bold text-[#0B6A6A] mb-2">⭐ 4.9</div>
                 <p className="text-gray-600">Customer Rating</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">Next Day</div>
+                <div className="text-3xl font-bold text-[#0B6A6A] mb-2">Next Day</div>
                 <p className="text-gray-600">Quotes</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">100%</div>
+                <div className="text-3xl font-bold text-[#0B6A6A] mb-2">100%</div>
                 <p className="text-gray-600">Best Price Match</p>
               </div>
             </div>
