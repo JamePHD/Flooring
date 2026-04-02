@@ -1,15 +1,7 @@
 import Link from "next/link";
 export default function Header() {
   return(
-    // <header style={{ padding: "16px", background: "blue", color: "white" }}>
-    //   <h1>Empirical Solutions</h1>
-
-    //   <nav style={{ marginTop: "10px" }}>
-    //     <a href="#" style={{ marginRight: "10px", color: "white" }}>Home</a>
-    //     <a href="#" style={{ marginRight: "10px", color: "white" }}>Comparison</a>
-    //   </nav>
-    // </header>
-    <header className="bg-[#074141] text-gray-300 border-b border-gray-800">
+    <header className="bg-[#0B6A6A] text-gray-300 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           
