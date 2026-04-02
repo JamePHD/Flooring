@@ -8,7 +8,7 @@ export default function Footer() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold">EF</span>
+                  <img src="/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
                 </div>
                 <span className="font-bold text-white text-lg">Emperical Flooring</span>
               </div>
