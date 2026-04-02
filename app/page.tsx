@@ -120,7 +120,7 @@ export default function Home() {
     <>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[500px] md:h-[600px] bg-[url('/images/flooringplaceholder.jpg')] bg-center bg-cover overflow-hidden">
+        <section className="relative h-[500px] md:h-[600px] bg-[url('/images/flooring2.jpg')] bg-center bg-cover overflow-hidden">
           <div className="absolute inset-0 opacity-20">
             <div className="absolute top-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-400 rounded-full blur-3xl"></div>
@@ -128,10 +128,10 @@ export default function Home() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
             <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-6xl font-bold text-[#074141] mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-bold text-[white] mb-6 leading-tight">
                 Premium Flooring for Your Dream Home
               </h1>
-              <p className="text-xl text-[#021717] mb-8 max-w-xl">
+              <p className="text-xl text-[white] mb-8 max-w-xl">
                 Discover Australia's best selection of engineered, hybrid, laminate, and solid flooring with expert guidance and fast delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
