@@ -128,10 +128,10 @@ export default function Home() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
             <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-bold text-[#074141] mb-6 leading-tight">
                 Premium Flooring for Your Dream Home
               </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-xl">
+              <p className="text-xl text-[#021717] mb-8 max-w-xl">
                 Discover Australia's best selection of engineered, hybrid, laminate, and solid flooring with expert guidance and fast delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">

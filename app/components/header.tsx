@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function Header() {
   return(
-    <header className="bg-[#0B6A6A] text-gray-300 border-b border-gray-800">
+    <header className="bg-white text-gray-800 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           
@@ -10,7 +10,7 @@ export default function Header() {
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
               <img src="/logos/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
             </div>
-            <span className="font-bold text-white text-lg">Emperical Flooring</span>
+            <span className="font-bold text-gray-800 text-lg">Emperical Flooring</span>
           </div>
 
           {/* Navigation */}
@@ -32,29 +32,11 @@ export default function Header() {
 
             <Link
               href="#"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md transition"
+              className="bg-[#15C4C4] hover:bg-[#109494] text-white text-sm px-4 py-2 rounded-md transition"
             >
               Get a Quote
             </Link>
           </div>
-
-          {/* Mobile Menu Placeholder */}
-          <button className="md:hidden text-gray-300 hover:text-white transition">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-7 h-7"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </header>
