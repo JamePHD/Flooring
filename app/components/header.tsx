@@ -9,14 +9,14 @@ export default function Header() {
     //     <a href="#" style={{ marginRight: "10px", color: "white" }}>Comparison</a>
     //   </nav>
     // </header>
-    <header className="bg-gray-900 text-gray-300 border-b border-gray-800">
+    <header className="bg-[#074141] text-gray-300 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           
           {/* Brand */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-              <img src="/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
+              <img src="/logos/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
             </div>
             <span className="font-bold text-white text-lg">Emperical Flooring</span>
           </div>
