@@ -135,9 +135,9 @@ export default function Home() {
                 Discover Australia's best selection of engineered, hybrid, laminate, and solid flooring with expert guidance and fast delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 bg-white text-[#0B6A6A] font-semibold rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2">
+                <Link href="/products" className="px-8 py-4 bg-white text-[#0B6A6A] font-semibold rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2">
                   Shop Now →
-                </button>
+                </Link>
                 <button className="px-8 py-4 bg-[#109494] text-white font-semibold rounded-lg hover:bg-[#074141] transition border border-blue-500">
                   View Styles
                 </button>
