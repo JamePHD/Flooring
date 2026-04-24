@@ -6,6 +6,9 @@
 }
 
 @theme inline {
+  --brand-background: #0B6A6A;
+  --brand-secondary: #109494;
+  --hover: #074141;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
