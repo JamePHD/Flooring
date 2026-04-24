@@ -50,7 +50,7 @@ export default function ProductsPage() {
         <nav style={{ marginTop: '10px' }}>
           <Link href="/" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Home</Link>
           <Link href="/products" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500, borderBottom: '2px solid white' }}>Products</Link>
-          <Link href="#" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Compare</Link>
+          <Link href="/compare" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Compare</Link>
           <Link href="#" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>About Us</Link>
           <Link href="#" style={{ color: 'white', textDecoration: 'none', fontWeight: 500 }}>News</Link>
         </nav>

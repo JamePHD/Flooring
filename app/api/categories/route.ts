@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { FLOORING_PRODUCT } from "@/data/template";
+import { Prisma, PrismaClient } from "@prisma/client/extension";
 
-const categories = [
-  {id: 1, name: "cate 1", slug: "cate-1", description: "description 1"},
-  {id: 2, name: "cate 2", slug: "cate-2", description: "description 2"}
-  ];
-//for category name (vinyl, carpet...)
+const prisma = new PrismaClient();
 export async function GET() {
-  return NextResponse.json(FLOORING_PRODUCT);
+    const categories = await prisma.category.findMany();
+          
+    return NextResponse.json(categories);
+  
   }
