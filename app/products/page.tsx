@@ -109,24 +109,26 @@ export default function ProductsPage() {
                     </div>
                     <span style={{ fontSize: '12px', color: '#15c4c4', fontWeight: 'bold' }}>{product.category}</span>
                     <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0, color: '#111827' }}>{product.name}</h3>
-                    <button
-                      style={{
-                        width: '100%',
-                        padding: '8px',
-                        background: '#15c4c4',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#0d7370'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = '#15c4c4'}
-                    >
-                      Compare
-                    </button>
+                    <Link href={'/drilldown'}>
+                      <button
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          background: '#15c4c4',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#0d7370'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = '#15c4c4'}
+                      >
+                        Compare
+                      </button>
+                    </Link>
                   </div>
                 ))}
               </div>
