@@ -88,11 +88,11 @@ export default function DrilldownPage() {
             <div className="text-4xl font-bold text-primary mb-4">
               ${product.price} <span className="text-lg text-gray-500">{product.unit}</span>
             </div>
-
-            <button className="px-8 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition">
-              Add to Cart
-            </button>
-
+            <Link href="/cart">
+                <button className="px-8 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition">
+                Add to Cart
+                </button>
+            </Link>
             {/* Features */}
             <div className="mt-10">
               <h3 className="text-xl text-primary font-semibold mb-4">Key Features</h3>
