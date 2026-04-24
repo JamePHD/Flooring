@@ -6,12 +6,14 @@ export default function Header() {
         <div className="flex items-center justify-between">
           
           {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-              <img src="/logos/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                <img src="/logos/logotest.png" alt="Emperical Flooring Logo" className="w-10 h-10 object-cover rounded-lg" />
+              </div>
+              <span className="font-bold text-gray-800 text-lg">Emperical Flooring</span>
             </div>
-            <span className="font-bold text-gray-800 text-lg">Emperical Flooring</span>
-          </div>
+          </Link>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-sm">
