@@ -15,8 +15,8 @@ export function createServerClient(accessToken?: string) {
         }, 
         global: {
             headers: accessToken
-            ? {Authorization: 'Bearer ${accessToken}' }
-            : {}, 
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {},
         },
     });
 }
