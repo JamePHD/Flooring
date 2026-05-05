@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js"; 
+declare const process: { env: Record<string, string | undefined> };
 
 export function createServerClient(accessToken?: string) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

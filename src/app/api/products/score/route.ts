@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleScoreProducts } from "@/controllers/scoringController";
+import { handleScoreProducts } from "@/src/controllers/scoringController";
 
 export async function POST(req: NextRequest) {
   try {

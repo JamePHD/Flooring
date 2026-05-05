@@ -1,0 +1,114 @@
+import { Section, Text } from "@react-email/components";
+import { EmailLayout } from "./components/EmailLayout";
+
+interface AdminBookingNotificationProps {
+  bookingId: string;
+  fullName: string;
+  email: string;
+  preferredDate: string;
+  preferredTime: string;
+  projectSummary: string;
+  referralSource: string | null;
+}
+
+export function AdminBookingNotification(props: AdminBookingNotificationProps) {
+  const {
+    bookingId,
+    fullName,
+    email,
+    preferredDate,
+    preferredTime,
+    projectSummary,
+    referralSource,
+  } = props;
+
+  return (
+    <EmailLayout
+      preview={`New consultation booking from ${fullName}`}
+      heading="New Consultation Booking"
+    >
+      <Text style={textStyle}>
+        A new consultation booking has been submitted.
+      </Text>
+
+      <Section style={summaryBox}>
+        <Text style={summaryHeading}>Customer details</Text>
+        <Text style={summaryItem}>
+          <strong>Name:</strong> {fullName}
+        </Text>
+        <Text style={summaryItem}>
+          <strong>Email:</strong> {email}
+        </Text>
+        {referralSource && (
+          <Text style={summaryItem}>
+            <strong>How they found us:</strong> {referralSource}
+          </Text>
+        )}
+      </Section>
+
+      <Section style={summaryBox}>
+        <Text style={summaryHeading}>Requested time</Text>
+        <Text style={summaryItem}>
+          <strong>Date:</strong> {preferredDate}
+        </Text>
+        <Text style={summaryItem}>
+          <strong>Time:</strong> {preferredTime}
+        </Text>
+      </Section>
+
+      <Section style={summaryBox}>
+        <Text style={summaryHeading}>Project</Text>
+        <Text style={descriptionStyle}>{projectSummary}</Text>
+      </Section>
+
+      <Text style={metaStyle}>Booking reference: {bookingId}</Text>
+    </EmailLayout>
+  );
+}
+
+const textStyle = {
+  color: "#333333",
+  fontSize: "16px",
+  lineHeight: "1.6",
+  margin: "0 0 16px 0",
+};
+
+const summaryBox = {
+  backgroundColor: "#f9f9f9",
+  borderRadius: "4px",
+  padding: "16px",
+  margin: "16px 0",
+};
+
+const summaryHeading = {
+  color: "#1a1a1a",
+  fontSize: "14px",
+  fontWeight: "bold" as const,
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.5px",
+  margin: "0 0 12px 0",
+};
+
+const summaryItem = {
+  color: "#333333",
+  fontSize: "15px",
+  lineHeight: "1.5",
+  margin: "0 0 4px 0",
+};
+
+const descriptionStyle = {
+  color: "#333333",
+  fontSize: "15px",
+  lineHeight: "1.5",
+  margin: "0",
+  padding: "12px",
+  backgroundColor: "#ffffff",
+  borderLeft: "3px solid #1a1a1a",
+};
+
+const metaStyle = {
+  color: "#999999",
+  fontSize: "12px",
+  fontFamily: "monospace",
+  margin: "16px 0 0 0",
+};
