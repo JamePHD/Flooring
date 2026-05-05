@@ -33,9 +33,18 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# QA scratch files — may contain credentials, do not commit
+qa/*.http
+qa/probe.tmp
+qa/test-*.pdf
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code session files
+.claude/
+CLAUDE-probe.tmp
