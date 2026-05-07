@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { withAdminAuth } from "@/src/middleware/authMiddleware";
 import {
   getBookingHandler,
@@ -6,23 +6,23 @@ import {
   deleteBookingHandler,
 } from "@/src/controllers/consultationBookingController";
 
-// Helper to extract [id] from the URL path (matches existing pattern)
-function getIdFromPath(req: NextRequest): string {
-  const segments = req.nextUrl.pathname.split("/");
-  return segments[segments.length - 1];
-}
+export const GET = withAdminAuth<{ id: string }>(
+  async (_req: NextRequest, _admin, { params }) => {
+    const { id } = await params;
+    return getBookingHandler(id);
+  }
+);
 
-export const GET = withAdminAuth(async (req: NextRequest, _admin) => {
-  const id = getIdFromPath(req);
-  return getBookingHandler(id);
-});
+export const PATCH = withAdminAuth<{ id: string }>(
+  async (req: NextRequest, admin, { params }) => {
+    const { id } = await params;
+    return updateBookingHandler(req as unknown as Request, id, admin.id);
+  }
+);
 
-export const PATCH = withAdminAuth(async (req: NextRequest, _admin) => {
-  const id = getIdFromPath(req);
-  return updateBookingHandler(req as unknown as Request, id);
-});
-
-export const DELETE = withAdminAuth(async (req: NextRequest, _admin) => {
-  const id = getIdFromPath(req);
-  return deleteBookingHandler(id);
-});
+export const DELETE = withAdminAuth<{ id: string }>(
+  async (_req: NextRequest, _admin, { params }) => {
+    const { id } = await params;
+    return deleteBookingHandler(id);
+  }
+);

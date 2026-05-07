@@ -4,17 +4,33 @@ import {
   createBooking,
   getBookingById,
   listBookings,
+  recordBookingHubspotSync,
   updateBooking,
   deleteBooking,
 } from "../models/consultationBookingModel";
+import { detectAndFlagDuplicate, recordStatusChange } from "../models/lead.model";
+import { sendEmail } from "../lib/email/send";
+import { consultationConfirmationEmail } from "../emails/consultationConfirmation";
+import { adminBookingNotificationEmail } from "../emails/adminBookingNotification";
+import { hubspotSyncFailureEmail } from "../emails/hubspotSyncFailure";
+import { syncBookingToHubspot, syncStatusToHubspot } from "../lib/hubspot/sync";
 
 // ─── Validation Schemas ──────────────────────────────────────
 
+// SCRUM-83 canonical lifecycle + legacy values for back-compat.
 const bookingStatusSchema = z.enum([
+  "new",
+  "contacted",
+  "in_progress",
+  "quote_sent",
+  "closed_won",
+  "closed_lost",
+  // legacy
   "pending",
   "confirmed",
-  "cancelled",
   "completed",
+  "cancelled",
+  "closed",
 ]);
 
 const createBookingSchema = z.object({
@@ -74,11 +90,60 @@ export async function createBookingHandler(req: Request) {
 
     const booking = await createBooking(parsed.data);
 
+    // AC#5: emails are best-effort. sendEmail never throws — failures are
+    // logged but do not block the 201 response or affect the DB write.
+    const adminTo =
+      process.env.SALES_REP_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL;
+
+    const customerEmail = consultationConfirmationEmail(booking);
+    await sendEmail({
+      to: booking.email,
+      subject: customerEmail.subject,
+      html: customerEmail.html,
+    });
+
+    if (adminTo) {
+      const adminEmail = adminBookingNotificationEmail(booking);
+      await sendEmail({
+        to: adminTo,
+        subject: adminEmail.subject,
+        html: adminEmail.html,
+        replyTo: adminEmail.replyTo,
+      });
+    }
+
+    // SCRUM-82: HubSpot sync. Best-effort, never throws. Records outcome
+    // on the booking row; on failure also pings the admin via email.
+    const hubspotResult = await syncBookingToHubspot(booking);
+    await recordBookingHubspotSync(booking.id, hubspotResult);
+    if (!hubspotResult.ok && adminTo) {
+      const failureEmail = hubspotSyncFailureEmail({
+        leadType: "consultation",
+        leadId: booking.id,
+        customerName: booking.full_name,
+        customerEmail: booking.email,
+        errorMessage: hubspotResult.error,
+      });
+      await sendEmail({
+        to: adminTo,
+        subject: failureEmail.subject,
+        html: failureEmail.html,
+      });
+    }
+
+    // SCRUM-86: duplicate detection. Best-effort, never throws (AC#5).
+    await detectAndFlagDuplicate({
+      leadType: "consultation",
+      leadId: booking.id,
+      email: booking.email,
+    });
+
     return NextResponse.json(
       {
         success: true,
         message: "Your consultation request has been received. We'll be in touch soon.",
         booking: {
+          id: booking.id,
           full_name: booking.full_name,
           email: booking.email,
           preferred_date: booking.preferred_date,
@@ -136,7 +201,11 @@ export async function getBookingHandler(id: string) {
   }
 }
 
-export async function updateBookingHandler(req: Request, id: string) {
+export async function updateBookingHandler(
+  req: Request,
+  id: string,
+  adminId?: string
+) {
   try {
     const body = await req.json();
     const parsed = updateBookingSchema.safeParse(body);
@@ -157,6 +226,23 @@ export async function updateBookingHandler(req: Request, id: string) {
     }
 
     const updated = await updateBooking(id, parsed.data);
+
+    // SCRUM-83: status change → record history (AC#3) + sync HubSpot (AC#5).
+    if (parsed.data.status && parsed.data.status !== existing.status) {
+      await recordStatusChange({
+        leadType: "consultation",
+        leadId: id,
+        fromStatus: existing.status,
+        toStatus: parsed.data.status,
+        changedBy: adminId ?? null,
+      });
+      if (existing.hubspot_contact_id) {
+        await syncStatusToHubspot({
+          hubspotContactId: existing.hubspot_contact_id,
+          newStatus: parsed.data.status,
+        });
+      }
+    }
 
     return NextResponse.json({ booking: updated });
   } catch (err) {

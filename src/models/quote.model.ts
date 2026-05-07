@@ -7,11 +7,21 @@ export type UserPath =
   | "architect_designer"
   | "property_investor";
 
+// SCRUM-83 canonical lifecycle + legacy values for back-compat
+// (rows already in the DB may have any of the legacy values; new
+// admin actions should use the canonical set).
 export type QuoteStatus =
-  | "pending"
+  | "new"
+  | "contacted"
   | "in_progress"
+  | "quote_sent"
+  | "closed_won"
+  | "closed_lost"
+  // legacy
+  | "pending"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "closed";
 
 export interface SelectedProduct {
   id: string;
@@ -32,6 +42,13 @@ export interface Quote {
   session_token: string | null;
   status: QuoteStatus;
   admin_notes: string | null;
+  // SCRUM-71 read tracking
+  read_at?: string | null;
+  // SCRUM-82 HubSpot sync tracking
+  hubspot_synced_at?: string | null;
+  hubspot_contact_id?: string | null;
+  hubspot_deal_id?: string | null;
+  hubspot_sync_error?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -129,4 +146,32 @@ export async function deleteQuote(id: string): Promise<void> {
   const { error } = await supabase.from("quotes").delete().eq("id", id);
   if (error)
     throw { message: error.message || "Failed to delete quote", status: 400 };
+}
+
+// SCRUM-82 — record HubSpot sync outcome on the quote row.
+// Best-effort: log on failure but don't throw (caller already returned 201).
+export async function recordQuoteHubspotSync(
+  id: string,
+  result:
+    | { ok: true; contactId: string; dealId?: string }
+    | { ok: false; error: string }
+): Promise<void> {
+  const supabase = createAdminClient();
+  const update = result.ok
+    ? {
+        hubspot_synced_at: new Date().toISOString(),
+        hubspot_contact_id: result.contactId,
+        hubspot_deal_id: result.dealId ?? null,
+        hubspot_sync_error: null,
+      }
+    : {
+        hubspot_sync_error: result.error.slice(0, 2000),
+      };
+  const { error } = await supabase.from("quotes").update(update).eq("id", id);
+  if (error) {
+    console.error(
+      `[hubspot] failed to record sync status on quote ${id}:`,
+      error.message
+    );
+  }
 }

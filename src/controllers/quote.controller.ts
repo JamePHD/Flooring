@@ -5,8 +5,15 @@ import {
   deleteQuote,
   getQuoteById,
   listQuotes,
+  recordQuoteHubspotSync,
   updateQuote,
 } from "../models/quote.model";
+import { detectAndFlagDuplicate, recordStatusChange } from "../models/lead.model";
+import { sendEmail } from "../lib/email/send";
+import { quoteConfirmationEmail } from "../emails/quoteConfirmation";
+import { adminQuoteNotificationEmail } from "../emails/adminQuoteNotification";
+import { hubspotSyncFailureEmail } from "../emails/hubspotSyncFailure";
+import { syncQuoteToHubspot, syncStatusToHubspot } from "../lib/hubspot/sync";
 
 // ─── Validation Schemas ──────────────────────────────────────
 
@@ -16,11 +23,21 @@ const userPathSchema = z.enum([
   "property_investor",
 ]);
 
+// SCRUM-83 canonical lifecycle + legacy values (kept so existing rows
+// and older clients keep working). The frontend should prefer the
+// canonical values.
 const statusSchema = z.enum([
-  "pending",
+  "new",
+  "contacted",
   "in_progress",
+  "quote_sent",
+  "closed_won",
+  "closed_lost",
+  // legacy
+  "pending",
   "completed",
   "cancelled",
+  "closed",
 ]);
 
 const selectedProductSchema = z.object({
@@ -99,6 +116,57 @@ export async function createQuoteHandler(req: Request) {
 
     const quote = await createQuote(parsed.data);
 
+    // AC#5: emails are best-effort. sendEmail never throws — failures are
+    // logged but do not block the 201 response or affect the DB write.
+    const adminTo =
+      process.env.SALES_REP_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL;
+
+    const customerEmail = quoteConfirmationEmail(quote);
+    await sendEmail({
+      to: quote.email,
+      subject: customerEmail.subject,
+      html: customerEmail.html,
+    });
+
+    if (adminTo) {
+      const adminEmail = adminQuoteNotificationEmail(quote);
+      await sendEmail({
+        to: adminTo,
+        subject: adminEmail.subject,
+        html: adminEmail.html,
+        replyTo: adminEmail.replyTo,
+      });
+    }
+
+    // SCRUM-82: HubSpot sync. Best-effort, never throws. Records outcome
+    // on the quote row; on failure, also pings the admin via email so they
+    // can manually add the lead in HubSpot.
+    const hubspotResult = await syncQuoteToHubspot(quote);
+    await recordQuoteHubspotSync(quote.id, hubspotResult);
+    if (!hubspotResult.ok && adminTo) {
+      const failureEmail = hubspotSyncFailureEmail({
+        leadType: "quote",
+        leadId: quote.id,
+        customerName: quote.full_name,
+        customerEmail: quote.email,
+        errorMessage: hubspotResult.error,
+      });
+      await sendEmail({
+        to: adminTo,
+        subject: failureEmail.subject,
+        html: failureEmail.html,
+      });
+    }
+
+    // SCRUM-86: duplicate detection. Best-effort, never throws (AC#5).
+    // If another lead already exists with this email, this row is flagged
+    // as a potential duplicate (admin sees it in the lead detail view).
+    await detectAndFlagDuplicate({
+      leadType: "quote",
+      leadId: quote.id,
+      email: quote.email,
+    });
+
     return NextResponse.json(
       {
         success: true,
@@ -156,7 +224,11 @@ export async function getQuoteHandler(id: string) {
   }
 }
 
-export async function updateQuoteHandler(req: Request, id: string) {
+export async function updateQuoteHandler(
+  req: Request,
+  id: string,
+  adminId?: string
+) {
   try {
     const body = await req.json().catch(() => null);
     const parsed = updateQuoteSchema.safeParse(body);
@@ -174,6 +246,26 @@ export async function updateQuoteHandler(req: Request, id: string) {
     }
 
     const updated = await updateQuote(id, parsed.data);
+
+    // SCRUM-83: when status changes, record history (AC#3) and sync to
+    // HubSpot (AC#5). Both best-effort — don't block the PATCH response.
+    if (parsed.data.status && parsed.data.status !== existing.status) {
+      await recordStatusChange({
+        leadType: "quote",
+        leadId: id,
+        fromStatus: existing.status,
+        toStatus: parsed.data.status,
+        changedBy: adminId ?? null,
+      });
+      if (existing.hubspot_contact_id) {
+        await syncStatusToHubspot({
+          hubspotContactId: existing.hubspot_contact_id,
+          hubspotDealId: existing.hubspot_deal_id,
+          newStatus: parsed.data.status,
+        });
+      }
+    }
+
     return NextResponse.json({ quote: updated });
   } catch (err) {
     return handleError(err);

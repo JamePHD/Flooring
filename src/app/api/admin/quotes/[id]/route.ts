@@ -14,9 +14,9 @@ export const GET = withAdminAuth<{ id: string }>(
 );
 
 export const PATCH = withAdminAuth<{ id: string }>(
-  async (req: NextRequest, _admin, { params }) => {
+  async (req: NextRequest, admin, { params }) => {
     const { id } = await params;
-    return updateQuoteHandler(req as unknown as Request, id);
+    return updateQuoteHandler(req as unknown as Request, id, admin.id);
   }
 );
 
