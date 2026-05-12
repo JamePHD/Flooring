@@ -98,7 +98,10 @@ export default function CartPage() {
 
     return (
         <main className="min-h-screen bg-gray-50 p-8">
-            <h1 className="text-3xl font-bold mb-8">Request a Quote</h1>
+            <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Request a Quote</h1>
+                <p style={{ fontSize: '16px', opacity: 0.9, margin: 0 }}></p>
+            </section>
 
             {items.length === 0 ? (
                 <p className="text-gray-600">Your cart is empty. <Link href="/" className="text-blue-600">Continue shopping</Link></p>
