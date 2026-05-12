@@ -97,10 +97,10 @@ export default function CartPage() {
     const finalTotal = subtotal + tax;
 
     return (
-        <main className="min-h-screen bg-gray-50 p-8">
+        <main className="flex-1">
             <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Request a Quote</h1>
-                <p style={{ fontSize: '16px', opacity: 0.9, margin: 0 }}></p>
+                <p style={{ fontSize: '16px', opacity: 0.9, margin: 0 }}>Fill out the form below to request a personalized quote from our team.</p>
             </section>
 
             {items.length === 0 ? (
