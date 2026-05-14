@@ -8,6 +8,7 @@ import { useState } from "react";
 const CompareCategories = [
     {label: "PRODUCT NAME", key: "name"},
     {label: "PRODUCT CODE", key: "code"},
+    {label: "BRAND", key: "brand"},
     { label: "DESCRIPTION", key: "description" },
     { label: "WEIGHT (KG)", key: "weight" },
     { label: "PLANK THICKNESS (MM)", key: "thickness" },
@@ -88,7 +89,7 @@ export default function ComparisonPage() {
                             <Link href="/products" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Products</Link>
                             <Link href="/compare" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500, borderBottom: '2px solid white' }}>Compare</Link>
                             <Link href="#" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>About Us</Link>
-                            <Link href="#" style={{ color: 'white', textDecoration: 'none', fontWeight: 500 }}>News</Link>
+                            <Link href="#" style={{ color: 'white', textDecoration: 'none', fontWeight: 500 }}>Vlogs</Link>
                         </nav>
                     </header>
                     <div style={{ background: "#ffffff", width: '100%' }}>
