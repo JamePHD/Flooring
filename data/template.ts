@@ -1,6 +1,7 @@
 //template
 export interface Item{
   id: number;
+  categoryId: number;
   name: string;
   slug: string;
   description: string;

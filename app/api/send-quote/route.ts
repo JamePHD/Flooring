@@ -1,8 +1,6 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface QuoteRequestBody {
   customerName: string;
   customerEmail: string;
@@ -19,6 +17,16 @@ interface QuoteRequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const resendApiKey = process.env.RESEND_API_KEY;
+
+    if (!resendApiKey) {
+      return NextResponse.json(
+        { error: 'Quote email service is not configured' },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(resendApiKey);
     const body: QuoteRequestBody = await request.json();
 
     // Validate required fields

@@ -30,5 +30,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
 , "app/api/categories"  ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "prisma.config.ts",
+    "src/app",
+    "src/controllers",
+    "src/middleware",
+    "src/models"
+  ]
 }
