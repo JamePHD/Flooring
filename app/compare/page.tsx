@@ -75,23 +75,6 @@ export default function ComparisonPage() {
 
         return (
                 <div>
-                    <header style={{ position: 'sticky', top: 0, zIndex: 50, padding: '16px', background: '#15c4c4', color: 'white' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                            <Logo />
-                            <div>
-                                <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>Flooring Solulu</h1>
-                                <p style={{ margin: 0, fontSize: '12px', opacity: 0.9 }}>Just Solutions</p>
-                            </div>
-                        </div>
-
-                        <nav style={{ marginTop: '10px' }}>
-                            <Link href="/" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Home</Link>
-                            <Link href="/products" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>Products</Link>
-                            <Link href="/compare" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500, borderBottom: '2px solid white' }}>Compare</Link>
-                            <Link href="#" style={{ marginRight: '20px', color: 'white', textDecoration: 'none', fontWeight: 500 }}>About Us</Link>
-                            <Link href="#" style={{ color: 'white', textDecoration: 'none', fontWeight: 500 }}>Vlogs</Link>
-                        </nav>
-                    </header>
                     <div style={{ background: "#ffffff", width: '100%' }}>
                         <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center', marginBottom: '40px', width:'100%' }}>
                             <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Compare Products</h1>

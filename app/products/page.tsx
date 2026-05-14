@@ -30,11 +30,11 @@ export default async function ProductsPage() {
 
   return (
     <main className="flex-1 bg-white">
-      <section className="bg-[#0B6A6A] px-4 py-12 text-center text-white sm:px-6">
+      <section style={{background: "linear-gradient(to right, #0d5a57, #118b85, #15c4c4)", color: 'white', padding: '40px 16px', textAlign: 'center', marginBottom: '40px', width:'100%' }}>
         <h1 className="text-4xl font-bold">Our Products</h1>
         <p className="mx-auto mt-3 max-w-2xl text-base text-white/90">
           Browse our current range of active flooring products from Supabase.
-        </p>
+        </p>  
       </section>
 
       {error ? (
