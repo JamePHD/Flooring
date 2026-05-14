@@ -239,10 +239,10 @@ export default function ProductsBrowser({
                     ) : null}
                   </div>
                   <Link
-                    href={`/drilldown?product=${encodeURIComponent(product.slug)}`}
+                    href={`/products/${product.slug}`}
                     className="mt-auto inline-flex h-10 items-center justify-center bg-[#15C4C4] px-4 text-sm font-bold text-white transition hover:bg-[#109494]"
                   >
-                    Compare
+                    View Product
                   </Link>
                 </div>
               </article>
