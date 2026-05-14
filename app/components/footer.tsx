@@ -32,9 +32,9 @@ export default function Footer() {
               <h4 className="font-bold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link href="#" className="hover:text-blue-400 transition">About Us</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">Blog</Link></li>
+                <li><Link href="/blog" className="hover:text-blue-400 transition">Blog</Link></li>
                 <li><Link href="#" className="hover:text-blue-400 transition">Contact</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">FAQ</Link></li>
+                <li><Link href="/policy" className="hover:text-blue-400 transition">Policy and Compliance</Link></li>
                 <li><Link href="#" className="hover:text-blue-400 transition">Site Map</Link></li>
               </ul>
             </div>
@@ -63,9 +63,9 @@ export default function Footer() {
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
             <p>&copy; 2026 Emperical Flooring Solulu. All Rights Reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0">
-              <Link href="#" className="hover:text-blue-400 transition">Privacy Policy</Link>
-              <Link href="#" className="hover:text-blue-400 transition">Terms & Conditions</Link>
-              <Link href="#" className="hover:text-blue-400 transition">Returns Policy</Link>
+              <Link href="/policy" className="hover:text-blue-400 transition">Policy and Compliance</Link>
+              <Link href="/terms" className="hover:text-blue-400 transition">Terms & Conditions</Link>
+              <Link href="/privacy-policy" className="hover:text-blue-400 transition">Privacy Policy</Link>
             </div>
           </div>
         </div>

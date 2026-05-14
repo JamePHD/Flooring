@@ -9,19 +9,30 @@ interface CartItem {
     price: number;
     quantity: number;
     image: string;
+    sqmPerBox: number;
 }
 
 export default function CartPage() {
     const [items, setItems] = useState<CartItem[]>([
-        { id: '1', name: 'Oak Flooring', price: 89.99, quantity: 2, image: '/oak.jpg' },
-        { id: '2', name: 'Maple Hardwood', price: 129.99, quantity: 1, image: '/maple.jpg' },
+        { id: '1', name: 'Oak Flooring', price: 89.99, quantity: 2, image: '/oak.jpg', sqmPerBox: 2.5 },
+        { id: '2', name: 'Maple Hardwood', price: 129.99, quantity: 1, image: '/maple.jpg', sqmPerBox: 2.0 },
     ]);
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerNotes, setCustomerNotes] = useState('');
+
+    const [phone, setPhone] = useState('');
+    const [city, setCity] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [detailAddress, setAddress] = useState('');
+
+    const [carryRequired, setCarryRequired] = useState(false);
+    const [installationRequired, setInstallationRequired] = useState(false);
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
 
     const isValidEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,10 +67,17 @@ export default function CartPage() {
                     customerName,
                     customerEmail,
                     customerNotes,
+                    phone,
+                    city,
+                    postalCode,
+                    detailAddress,
+                    carryRequired,
+                    installationRequired,
                     items: items.map((item) => ({
                         name: item.name,
                         quantity: item.quantity,
                         price: item.price,
+                        sqmPerBox: item.sqmPerBox
                     })),
                     subtotal,
                     tax,
@@ -76,6 +94,8 @@ export default function CartPage() {
             setCustomerName('');
             setCustomerEmail('');
             setCustomerNotes('');
+            setCarryRequired(false);
+            setInstallationRequired(false);
         } catch (error) {
             setSubmitMessage({ type: 'error', text: 'Failed to send quote request. Please try again.' });
         } finally {
@@ -123,10 +143,11 @@ export default function CartPage() {
                                     <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded" />
                                     <div className="flex-1">
                                         <h3 className="font-semibold text-lg">{item.name}</h3>
-                                        <p className="text-gray-600">${item.price.toFixed(2)}/m²</p>
+                                        <p className="text-gray-600">${item.price.toFixed(2)}/m2</p>
+                                        <p className="text-sm text-gray-500 mt-1">{item.sqmPerBox} sqm per box</p>
                                         <div className="flex gap-2 mt-2 items-center">
                                             <input type="number" min="0" step="1" value={item.quantity} onChange={(e) => updateQuantity(item.id, parseFloat(e.target.value) || 0)} className="px-3 py-1 border rounded w-20" />
-                                            <span>m²</span>
+                                            <span>boxes</span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end justify-between">
@@ -160,10 +181,69 @@ export default function CartPage() {
                                             <p className="text-red-600 text-sm mt-1">Please enter a valid email address</p>
                                         )}
                                     </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Phone Number</label>
+                                        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your phone number" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" />
+                                    </div>
+
+                                    <div className="w-full space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col">
+                                                <label className="block text-sm font-semibold mb-2">City</label>
+                                                <input
+                                                    type="text"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
+                                                    placeholder="Enter city or suburb"
+                                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="block text-sm font-semibold mb-2">Postal Code</label>
+                                                <input
+                                                    type="text"
+                                                    value={postalCode}
+                                                    onChange={(e) => setPostalCode(e.target.value)}
+                                                    placeholder="e.g. 2000"
+                                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <input 
+                                                type="checkbox" 
+                                                id="carryRequired" 
+                                                checked={carryRequired} 
+                                                onChange={(e) => setCarryRequired(e.target.checked)} 
+                                                className="w-4 h-4 rounded cursor-pointer"
+                                            />
+                                            <label htmlFor="carryRequired" className="text-sm font-semibold cursor-pointer">
+                                                Carry Required
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <input 
+                                                type="checkbox" 
+                                                id="installationRequired" 
+                                                checked={installationRequired} 
+                                                onChange={(e) => setInstallationRequired(e.target.checked)} 
+                                                className="w-4 h-4 rounded cursor-pointer"
+                                            />
+                                            <label htmlFor="installationRequired" className="text-sm font-semibold cursor-pointer">
+                                                Installation Required
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label className="block text-sm font-semibold mb-2">Additional Notes</label>
                                         <textarea value={customerNotes} onChange={(e) => setCustomerNotes(e.target.value)} placeholder="Any additional information for the sales representative" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none" rows={4} />
                                     </div>
+                                    
                                 </div>
                                 <p className="text-gray-600 text-sm mt-4">Fields marked with <span className="text-red-600">*</span> are required</p>
                             </div>
