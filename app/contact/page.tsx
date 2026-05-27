@@ -157,7 +157,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   style={{
-                    background: "linear-gradient(to right, #0d5a57, #118b85, #15c4c4)",
+                    background: "#15c4c4",
                     color: "white",
                     padding: "12px 24px",
                     border: "none",
@@ -182,8 +182,8 @@ export default function ContactPage() {
               <div style={{ marginBottom: "30px" }}>
                 <h3 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "8px", color: "#0d5a57" }}>📞 Phone</h3>
                 <p style={{ margin: 0, color: "#555", lineHeight: "1.6" }}>
-                  <a href="tel:1300119313" style={{ color: "#15c4c4", textDecoration: "none" }}>
-                    1300 119 313
+                  <a href="tel:1234567890" style={{ color: "#15c4c4", textDecoration: "none" }}>
+                    1234 567 890
                   </a>
                 </p>
               </div>
@@ -191,8 +191,8 @@ export default function ContactPage() {
               <div style={{ marginBottom: "30px" }}>
                 <h3 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "8px", color: "#0d5a57" }}>📧 Email</h3>
                 <p style={{ margin: 0, color: "#555", lineHeight: "1.6" }}>
-                  <a href="mailto:info@flooringsolutions.com" style={{ color: "#15c4c4", textDecoration: "none" }}>
-                    info@flooringsolutions.com
+                  <a href="mailto:info@royalsolulu.com.au" style={{ color: "#15c4c4", textDecoration: "none" }}>
+                    info@royalsolulu.com.au
                   </a>
                 </p>
               </div>
