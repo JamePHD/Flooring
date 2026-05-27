@@ -7,7 +7,7 @@ const navItems = [
   { href: "/compare", label: "Compare" },
   { href: "#", label: "About Us" },
   { href: "/news", label: "News" },
-  { href: "#", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
