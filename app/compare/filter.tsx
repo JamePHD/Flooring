@@ -62,7 +62,7 @@ export default function CompareFilter({
       (selectedUse === "residential" && product.isResidential) || (selectedUse === "commercial" && product.isCommercial);
 
       const matchesSearch = !normalizedSearch ||
-      [product.name, product.brand, product.categoryName, product.description]
+      [product.name, product.displayName, product.code, product.brand, product.categoryName, product.description]
       .filter(Boolean).some((value) => value!.toLowerCase().includes(normalizedSearch));
 
       return matchesCat && matchesBrand && matchesUse && matchesSearch;
@@ -171,7 +171,7 @@ export default function CompareFilter({
                       }}
                     >
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "#111827" }}>
-                        {product.name || "Unnamed product"}
+                        {product.displayName || "Unnamed product"}
                       </div>
                       <div style={{ marginTop: "6px", fontSize: "13px", color: "#6b7280" }}>
                         {product.brand || product.category || "No brand"}
