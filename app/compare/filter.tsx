@@ -5,14 +5,12 @@ import { useMemo, useState } from "react";
 interface CompareFilterProps {
   dbProducts: any[];
   isLoading: boolean;
-  comparedProducts: any[];
   onSelectProduct: (product: any) => void;
 }
 
 export default function CompareFilter({
   dbProducts,
   isLoading,
-  comparedProducts,
   onSelectProduct,
 }: CompareFilterProps) {
   const [isCartOpen, setIsCartOpen] = useState(false);
