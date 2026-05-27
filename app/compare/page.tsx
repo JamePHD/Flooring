@@ -1,8 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import CompareFilter from "./filter";
+import {
+  getStoredCompareProducts,
+  setStoredCompareProducts,
+  StoredCompareProduct,
+} from "@/app/lib/local-storage";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
@@ -31,7 +36,7 @@ export default function ComparisonPage() {
       try {
         setIsLoading(true);
 
-        // 1. GỌI API THEO ĐÚNG SƠ ĐỒ ERD CỦA SUPABASE
+       
         const { data: productRows, error } = await supabase
           .from('product_variants')
           .select('id, sku, colour_name, products (id, name, slug, brand, short_description, description, image_url, is_residential, is_commercial, created_at, is_active, categories(name, slug), product_attributes(value, attributes(name, slug)))');
@@ -100,15 +105,15 @@ export default function ComparisonPage() {
     fetchProducts();
   }, []);
 
-  const addProductToCompare = (product: any) => {
+  const addProductToCompare = (product: StoredCompareProduct) => {
     setComparedProducts((current) => {
       if (current.find((item) => String(item.id) === String(product.id))) return current;
       return [...current, product];
     });
   };
 
-  const removeProducts = (id: any) => {
-    setComparedProducts((current) => current.filter((p) => String(p.id) !== String(id)));
+  const removeProducts = (id: string) => {
+    setComparedProducts((current) => current.filter((product) => product.id !== id));
   };
 
   const hasComparedProducts = comparedProducts.length > 0;
@@ -129,39 +134,32 @@ export default function ComparisonPage() {
         />
 
         {hasComparedProducts ? (
-          <div style={{ background: "#ffffff", margin: "auto", padding: "40px", overflowX: "auto" }}>
+          <div style={{ background: "#ffffff", margin: "auto", padding: "40px" }}>
             <table style={{ width: "70%", borderCollapse: "collapse", background: "#fff", margin: "auto" }}>
               <thead>
                 <tr>
-                  <th style={{ border: "1px solid #e5e7eb", padding: 12, background: "#f3f4f6", minWidth: 180 }}></th>
+                  <th style={{ border: "1px solid #000000", padding: 12, background: "#f3f4f6", minWidth: 180 }}></th>
                   {comparedProducts.map((product) => (
-                    <th key={product.id} style={{ border: "1px solid #e5e7eb", padding: 12, background: "#f3f4f6", minWidth: 220, position: "relative" }}>
-                      <button 
-                        onClick={() => removeProducts(product.id)} 
-                        style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: "50%", background: "#696969", color: "white", border: "none", fontSize: 14, fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                      >
-                        &times;
+                    <th key={product.id} style={{ border: "1px solid #000000", padding: 12, background: "#f3f4f6", minWidth: 220, position: "relative" }}>
+                      <button onClick={() => removeProducts(product.id)} style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: "50%", background: "#696969", border: "none", fontSize: 14, fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        x
                       </button>
                       <div style={{ width: "100%", height: 120, background: "#e5e7eb", borderRadius: 8, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {product.imageUrl ? (
-                          <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} />
-                        ) : (
-                          <span style={{ color: "#9ca3af", fontSize: 14 }}>Product Image</span>
-                        )}
+                        <span style={{ color: "#9ca3af", fontSize: 14 }}>Product Image</span>
                       </div>
-                      <div style={{ fontWeight: 600, fontSize: 16, color: "#111827", textAlign: "left" }}>{product.displayName}</div>
-                      <div style={{ fontSize: 13, color: "#6b7280", textAlign: "left", marginTop: "4px" }}>Code: {product.code}</div>
+                      <div style={{ fontWeight: 300, fontSize: 18, color: "#000000" }}>{product.name}</div>
+                      <div style={{ fontSize: 14, color: "#000000" }}>{product.code}</div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {CompareCategories.map((cat) => (
-                  <tr key={cat.key}>
-                    <td style={{ border: "1px solid #e5e7eb", padding: 12, fontWeight: 700, background: "#f9fafb", color: "#374151", textAlign: "left" }}>{cat.label}</td>
+                {CompareCategories.map((category) => (
+                  <tr key={category.key}>
+                    <td style={{ border: "1px solid #000000", padding: 12, fontWeight: 700, background: "#f9fafb", color: "#000000", textAlign: "center" }}>{category.label}</td>
                     {comparedProducts.map((product) => (
-                      <td key={`${product.id}-${cat.key}`} style={{ border: "1px solid #e5e7eb", padding: 12, color: "#4b5563" }}>
-                        {product[cat.key] !== null && product[cat.key] !== undefined && String(product[cat.key]).trim() !== "" ? String(product[cat.key]) : "-"}
+                      <td key={`${product.id}-${category.key}`} style={{ border: "1px solid #000000", padding: 12, color: "#000000" }}>
+                        {product[category.key] ?? "-"}
                       </td>
                     ))}
                   </tr>
@@ -170,8 +168,8 @@ export default function ComparisonPage() {
             </table>
           </div>
         ) : (
-          <div style={{ width: "70%", margin: "auto", padding: "40px", textAlign: "center" }}>
-            <p style={{ fontSize: "16px", color: "#6b7280" }}>No products added to compare.</p>
+          <div style={{ width: "70%", margin: " auto", padding: "40px", textAlign: "center" }}>
+            <p style={{ fontSize: "18px", color: "#374151" }}>No products added to compare.</p>
           </div>
         )}
       </div>
