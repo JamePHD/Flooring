@@ -90,7 +90,12 @@ export default function CartPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send quote');
+                const errorBody = await response.json().catch(() => null);
+                const errorMessage =
+                    typeof errorBody?.error === 'string'
+                        ? errorBody.error
+                        : 'Failed to send quote';
+                throw new Error(errorMessage);
             }
 
             setSubmitMessage({ type: 'success', text: 'Quote request sent successfully! The sales team will contact you soon.' });
@@ -100,8 +105,13 @@ export default function CartPage() {
             setCustomerNotes('');
             setCarryRequired(false);
             setInstallationRequired(false);
-        } catch {
-            setSubmitMessage({ type: 'error', text: 'Failed to send quote request. Please try again.' });
+        } catch (error) {
+            setSubmitMessage({
+                type: 'error',
+                text: error instanceof Error
+                    ? error.message
+                    : 'Failed to send quote request. Please try again.',
+            });
         } finally {
             setIsSubmitting(false);
         }
