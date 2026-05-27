@@ -1,18 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { StoredCompareProduct } from "@/app/lib/local-storage";
 
 interface CompareFilterProps {
-  dbProducts: any[];
+  dbProducts: StoredCompareProduct[];
   isLoading: boolean;
-  comparedProducts: any[];
-  onSelectProduct: (product: any) => void;
+  onSelectProduct: (product: StoredCompareProduct) => void;
 }
 
 export default function CompareFilter({
   dbProducts,
   isLoading,
-  comparedProducts,
   onSelectProduct,
 }: CompareFilterProps) {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -37,20 +36,6 @@ export default function CompareFilter({
     );
   }, [dbProducts]);
 
-  const uses = useMemo(() => {
-    const values = new Set<string>();
-
-    dbProducts.forEach((product) => {
-      if (product.isResidential) values.add("residential");
-      if (product.isCommercial) values.add("commercial");
-      if (typeof product.use === "string" && product.use.trim()) {
-        values.add(product.use.trim());
-      }
-    });
-
-    return Array.from(values).sort();
-  }, [dbProducts]);
-
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
@@ -63,7 +48,8 @@ export default function CompareFilter({
 
       const matchesSearch = !normalizedSearch ||
       [product.name, product.brand, product.categoryName, product.description]
-      .filter(Boolean).some((value) => value!.toLowerCase().includes(normalizedSearch));
+      .filter((value): value is string => typeof value === "string")
+      .some((value) => value.toLowerCase().includes(normalizedSearch));
 
       return matchesCat && matchesBrand && matchesUse && matchesSearch;
     });

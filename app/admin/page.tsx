@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
 type Entry = {
   id: number;
   name: string;
   product_code?: string | null;
-  [key: string]: any;
+  [key: string]: string | number | null | undefined;
 };
 
 type ProductForm = {
@@ -77,7 +77,7 @@ const initialProduct: ProductForm = {
 };
 
 export default function AdminPage() {
-  const supabase = createBrowserClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
   );
@@ -127,38 +127,42 @@ export default function AdminPage() {
       return left > right ? -1 : 1;
     });
 
+  function toFormText(value: string | number | null | undefined) {
+    return value?.toString() ?? "";
+  }
+
   function loadProductFromEntry(entry: Entry): ProductForm {
     return {
       productName: entry.name ?? "",
       productCode: entry.product_code ?? "",
-      brand: entry.brand ?? "",
-      weightKg: entry.weight_kg?.toString() ?? "",
-      plankThicknessMm: entry.plank_thickness_mm?.toString() ?? "",
-      plankWidthMm: entry.plank_width_mm?.toString() ?? "",
-      plankLengthMm: entry.plank_length_mm?.toString() ?? "",
-      productType: entry.product_type ?? "",
-      range: entry.range ?? "",
-      installationType: entry.installation_type ?? "",
-      m2PerPackBox: entry.m2_per_pack_box?.toString() ?? "",
-      boardsPerPackBox: entry.boards_per_pack_box?.toString() ?? "",
-      warranty: entry.warranty ?? "",
-      colorTone: entry.color_tone ?? "",
-      species: entry.species ?? "",
-      pricePerM2: entry.price_per_m2?.toString() ?? "",
-      waterResistance: entry.water_resistance ?? "",
-      surfaceTexture: entry.surface_texture ?? "",
-      surfaceFinish: entry.surface_finish ?? "",
-      edgeType: entry.edge_type ?? "",
-      jointType: entry.joint_type ?? "",
-      wearLayerThickness: entry.wear_layer_thickness?.toString() ?? "",
-      veneerThickness: entry.veneer_thickness?.toString() ?? "",
-      plankLayout: entry.plank_layout ?? "",
-      plankStyle: entry.plank_style ?? "",
-      vocEmission: entry.voc_emission ?? "",
-      jankaRating: entry.janka_rating ?? "",
-      wearRating: entry.wear_rating ?? "",
-      grade: entry.grade ?? "",
-      repeats: entry.repeats ?? "",
+      brand: toFormText(entry.brand),
+      weightKg: toFormText(entry.weight_kg),
+      plankThicknessMm: toFormText(entry.plank_thickness_mm),
+      plankWidthMm: toFormText(entry.plank_width_mm),
+      plankLengthMm: toFormText(entry.plank_length_mm),
+      productType: toFormText(entry.product_type),
+      range: toFormText(entry.range),
+      installationType: toFormText(entry.installation_type),
+      m2PerPackBox: toFormText(entry.m2_per_pack_box),
+      boardsPerPackBox: toFormText(entry.boards_per_pack_box),
+      warranty: toFormText(entry.warranty),
+      colorTone: toFormText(entry.color_tone),
+      species: toFormText(entry.species),
+      pricePerM2: toFormText(entry.price_per_m2),
+      waterResistance: toFormText(entry.water_resistance),
+      surfaceTexture: toFormText(entry.surface_texture),
+      surfaceFinish: toFormText(entry.surface_finish),
+      edgeType: toFormText(entry.edge_type),
+      jointType: toFormText(entry.joint_type),
+      wearLayerThickness: toFormText(entry.wear_layer_thickness),
+      veneerThickness: toFormText(entry.veneer_thickness),
+      plankLayout: toFormText(entry.plank_layout),
+      plankStyle: toFormText(entry.plank_style),
+      vocEmission: toFormText(entry.voc_emission),
+      jankaRating: toFormText(entry.janka_rating),
+      wearRating: toFormText(entry.wear_rating),
+      grade: toFormText(entry.grade),
+      repeats: toFormText(entry.repeats),
     };
   }
 
@@ -253,7 +257,7 @@ export default function AdminPage() {
                 padding: '16px',
                 display: 'flex',
                 gap: '12px'}}>
-                Manage entries in the "Products" Supabase table
+                Manage entries in the &quot;Products&quot; Supabase table
             </div>
 
             <div style={{
