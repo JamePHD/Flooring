@@ -1,79 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 
 type Entry = {
   id: number;
   name: string;
+  brand?: string | null;
+  description?: string | null;
+  is_residential?: boolean | null;
+  is_commercial?: boolean | null;
   product_code?: string | null;
   [key: string]: any;
 };
 
 type ProductForm = {
   productName: string;
-  productCode: string;
   brand: string;
-  weightKg: string;
-  plankThicknessMm: string;
-  plankWidthMm: string;
-  plankLengthMm: string;
-  productType: string;
-  range: string;
-  installationType: string;
-  m2PerPackBox: string;
-  boardsPerPackBox: string;
-  warranty: string;
-  colorTone: string;
-  species: string;
-  pricePerM2: string;
-  waterResistance: string;
-  surfaceTexture: string;
-  surfaceFinish: string;
-  edgeType: string;
-  jointType: string;
-  wearLayerThickness: string;
-  veneerThickness: string;
-  plankLayout: string;
-  plankStyle: string;
-  vocEmission: string;
-  jankaRating: string;
-  wearRating: string;
-  grade: string;
-  repeats: string;
+  description: string;
+  isResidential: boolean;
+  isCommercial: boolean;
 };
 
 const initialProduct: ProductForm = {
   productName: "",
-  productCode: "",
   brand: "",
-  weightKg: "",
-  plankThicknessMm: "",
-  plankWidthMm: "",
-  plankLengthMm: "",
-  productType: "",
-  range: "",
-  installationType: "",
-  m2PerPackBox: "",
-  boardsPerPackBox: "",
-  warranty: "",
-  colorTone: "",
-  species: "",
-  pricePerM2: "",
-  waterResistance: "",
-  surfaceTexture: "",
-  surfaceFinish: "",
-  edgeType: "",
-  jointType: "",
-  wearLayerThickness: "",
-  veneerThickness: "",
-  plankLayout: "",
-  plankStyle: "",
-  vocEmission: "",
-  jankaRating: "",
-  wearRating: "",
-  grade: "",
-  repeats: "",
+  description: "",
+  isResidential: false,
+  isCommercial: false,
 };
 
 export default function AdminPage() {
@@ -130,35 +84,10 @@ export default function AdminPage() {
   function loadProductFromEntry(entry: Entry): ProductForm {
     return {
       productName: entry.name ?? "",
-      productCode: entry.product_code ?? "",
       brand: entry.brand ?? "",
-      weightKg: entry.weight_kg?.toString() ?? "",
-      plankThicknessMm: entry.plank_thickness_mm?.toString() ?? "",
-      plankWidthMm: entry.plank_width_mm?.toString() ?? "",
-      plankLengthMm: entry.plank_length_mm?.toString() ?? "",
-      productType: entry.product_type ?? "",
-      range: entry.range ?? "",
-      installationType: entry.installation_type ?? "",
-      m2PerPackBox: entry.m2_per_pack_box?.toString() ?? "",
-      boardsPerPackBox: entry.boards_per_pack_box?.toString() ?? "",
-      warranty: entry.warranty ?? "",
-      colorTone: entry.color_tone ?? "",
-      species: entry.species ?? "",
-      pricePerM2: entry.price_per_m2?.toString() ?? "",
-      waterResistance: entry.water_resistance ?? "",
-      surfaceTexture: entry.surface_texture ?? "",
-      surfaceFinish: entry.surface_finish ?? "",
-      edgeType: entry.edge_type ?? "",
-      jointType: entry.joint_type ?? "",
-      wearLayerThickness: entry.wear_layer_thickness?.toString() ?? "",
-      veneerThickness: entry.veneer_thickness?.toString() ?? "",
-      plankLayout: entry.plank_layout ?? "",
-      plankStyle: entry.plank_style ?? "",
-      vocEmission: entry.voc_emission ?? "",
-      jankaRating: entry.janka_rating ?? "",
-      wearRating: entry.wear_rating ?? "",
-      grade: entry.grade ?? "",
-      repeats: entry.repeats ?? "",
+      description: entry.description ?? "",
+      isResidential: entry.is_residential ?? false,
+      isCommercial: entry.is_commercial ?? false,
     };
   }
 
@@ -168,35 +97,10 @@ export default function AdminPage() {
     setLoading(true);
     const insertData = {
       name: product.productName,
-      product_code: product.productCode,
-      brand: product.brand,
-      weight_kg: product.weightKg ? Number(product.weightKg) : null,
-      plank_thickness_mm: product.plankThicknessMm ? Number(product.plankThicknessMm) : null,
-      plank_width_mm: product.plankWidthMm ? Number(product.plankWidthMm) : null,
-      plank_length_mm: product.plankLengthMm ? Number(product.plankLengthMm) : null,
-      product_type: product.productType,
-      range: product.range,
-      installation_type: product.installationType,
-      m2_per_pack_box: product.m2PerPackBox ? Number(product.m2PerPackBox) : null,
-      boards_per_pack_box: product.boardsPerPackBox ? Number(product.boardsPerPackBox) : null,
-      warranty: product.warranty,
-      color_tone: product.colorTone,
-      species: product.species,
-      price_per_m2: product.pricePerM2 ? Number(product.pricePerM2) : null,
-      water_resistance: product.waterResistance,
-      surface_texture: product.surfaceTexture,
-      surface_finish: product.surfaceFinish,
-      edge_type: product.edgeType,
-      joint_type: product.jointType,
-      wear_layer_thickness: product.wearLayerThickness ? Number(product.wearLayerThickness) : null,
-      veneer_thickness: product.veneerThickness ? Number(product.veneerThickness) : null,
-      plank_layout: product.plankLayout,
-      plank_style: product.plankStyle,
-      voc_emission: product.vocEmission,
-      janka_rating: product.jankaRating,
-      wear_rating: product.wearRating,
-      grade: product.grade,
-      repeats: product.repeats,
+      brand: product.brand.trim() || null,
+      description: product.description.trim() || null,
+      is_residential: product.isResidential,
+      is_commercial: product.isCommercial,
     };
 
     const query = editingId
@@ -250,16 +154,6 @@ export default function AdminPage() {
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px',
                 overflow: 'hidden',
-                padding: '16px',
-                display: 'flex',
-                gap: '12px'}}>
-                Manage entries in the "Products" Supabase table
-            </div>
-
-            <div style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                overflow: 'hidden',
                 padding: '16px'}}>
                 <div style={{ marginBottom: 12 }}>
                   <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add Product</h2>
@@ -267,49 +161,54 @@ export default function AdminPage() {
                 </div>
                 <form onSubmit={addItem} style={{ display: 'grid', gap: 16 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 12 }}>
-                        {[
-                          { label: 'Product Name', key: 'productName', type: 'text' },
-                          { label: 'Product Code', key: 'productCode', type: 'text' },
-                          { label: 'Brand', key: 'brand', type: 'text' },
-                          { label: 'Weight (kg)', key: 'weightKg', type: 'number' },
-                          { label: 'Plank Thickness (mm)', key: 'plankThicknessMm', type: 'number' },
-                          { label: 'Plank Width (mm)', key: 'plankWidthMm', type: 'number' },
-                          { label: 'Plank Length (mm)', key: 'plankLengthMm', type: 'number' },
-                          { label: 'Product Type', key: 'productType', type: 'text' },
-                          { label: 'Range', key: 'range', type: 'text' },
-                          { label: 'Installation Type', key: 'installationType', type: 'text' },
-                          { label: 'm2 per pack/box', key: 'm2PerPackBox', type: 'number' },
-                          { label: 'Boards per pack/box', key: 'boardsPerPackBox', type: 'number' },
-                          { label: 'Warranty', key: 'warranty', type: 'text' },
-                          { label: 'Color Tone', key: 'colorTone', type: 'text' },
-                          { label: 'Species', key: 'species', type: 'text' },
-                          { label: 'Price (per m2)', key: 'pricePerM2', type: 'number' },
-                          { label: 'Water Resistance', key: 'waterResistance', type: 'text' },
-                          { label: 'Surface Texture', key: 'surfaceTexture', type: 'text' },
-                          { label: 'Surface Finish', key: 'surfaceFinish', type: 'text' },
-                          { label: 'Edge Type', key: 'edgeType', type: 'text' },
-                          { label: 'Joint Type', key: 'jointType', type: 'text' },
-                          { label: 'Wear layer Thickness', key: 'wearLayerThickness', type: 'number' },
-                          { label: 'Veneer Thickness (E.Timber)', key: 'veneerThickness', type: 'number' },
-                          { label: 'Plank Layout', key: 'plankLayout', type: 'text' },
-                          { label: 'Plank Style', key: 'plankStyle', type: 'text' },
-                          { label: 'VOC Emission', key: 'vocEmission', type: 'text' },
-                          { label: 'Janka Rating (E.Timber)', key: 'jankaRating', type: 'text' },
-                          { label: 'Wear Rating', key: 'wearRating', type: 'text' },
-                          { label: 'Grade (E.Timber)', key: 'grade', type: 'text' },
-                          { label: 'Repeats', key: 'repeats', type: 'text' },
-                        ].map((field) => (
-                          <label key={field.key} style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                            <span style={{ fontWeight: 600 }}>{field.label}</span>
-                            <input
-                              value={product[field.key as keyof ProductForm]}
-                              onChange={(e) => setProduct((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                              placeholder={field.label}
-                              type={field.type}
-                              style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%' }}
-                            />
-                          </label>
-                        ))}
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                        <span style={{ fontWeight: 600 }}>Product Name</span>
+                        <input
+                          value={product.productName}
+                          onChange={(e) => setProduct((prev) => ({ ...prev, productName: e.target.value }))}
+                          placeholder="Product Name"
+                          type="text"
+                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%' }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                        <span style={{ fontWeight: 600 }}>Brand</span>
+                        <input
+                          value={product.brand}
+                          onChange={(e) => setProduct((prev) => ({ ...prev, brand: e.target.value }))}
+                          placeholder="Brand"
+                          type="text"
+                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%' }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                        <span style={{ fontWeight: 600 }}>Description</span>
+                        <textarea
+                          value={product.description}
+                          onChange={(e) => setProduct((prev) => ({ ...prev, description: e.target.value }))}
+                          placeholder="Description"
+                          rows={4}
+                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%', resize: 'vertical' }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                        <span style={{ fontWeight: 600 }}>Residential</span>
+                        <input
+                          type="checkbox"
+                          checked={product.isResidential}
+                          onChange={(e) => setProduct((prev) => ({ ...prev, isResidential: e.target.checked }))}
+                          style={{ width: 18, height: 18 }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                        <span style={{ fontWeight: 600 }}>Commercial</span>
+                        <input
+                          type="checkbox"
+                          checked={product.isCommercial}
+                          onChange={(e) => setProduct((prev) => ({ ...prev, isCommercial: e.target.checked }))}
+                          style={{ width: 18, height: 18 }}
+                        />
+                      </label>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
                         <button type="button" disabled={loading} onClick={() => {
@@ -372,13 +271,13 @@ export default function AdminPage() {
                   </label>
                 </div>
 
-                <div style={{ overflowX: 'auto' }}>
+                <div style={{ overflowX: 'auto', maxHeight: '420px', overflowY: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Name</th>
-                        <th style={{ textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Code</th>
-                        <th style={{ textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
+                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Name</th>
+                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Code</th>
+                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
