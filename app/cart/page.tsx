@@ -1,22 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-interface CartItem {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-    sqmPerBox: number;
-}
+import {
+    getStoredCartItems,
+    setStoredCartItems,
+    StoredCartItem,
+} from '@/app/lib/local-storage';
 
 export default function CartPage() {
-    const [items, setItems] = useState<CartItem[]>([
-        { id: '1', name: 'Oak Flooring', price: 89.99, quantity: 2, image: '/oak.jpg', sqmPerBox: 2.5 },
-        { id: '2', name: 'Maple Hardwood', price: 129.99, quantity: 1, image: '/maple.jpg', sqmPerBox: 2.0 },
-    ]);
+    const [items, setItems] = useState<StoredCartItem[]>([]);
+    const [hasLoadedCart, setHasLoadedCart] = useState(false);
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
@@ -33,6 +27,16 @@ export default function CartPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    useEffect(() => {
+        setItems(getStoredCartItems());
+        setHasLoadedCart(true);
+    }, []);
+
+    useEffect(() => {
+        if (hasLoadedCart) {
+            setStoredCartItems(items);
+        }
+    }, [hasLoadedCart, items]);
 
     const isValidEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -86,7 +90,12 @@ export default function CartPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send quote');
+                const errorBody = await response.json().catch(() => null);
+                const errorMessage =
+                    typeof errorBody?.error === 'string'
+                        ? errorBody.error
+                        : 'Failed to send quote';
+                throw new Error(errorMessage);
             }
 
             setSubmitMessage({ type: 'success', text: 'Quote request sent successfully! The sales team will contact you soon.' });
@@ -97,7 +106,12 @@ export default function CartPage() {
             setCarryRequired(false);
             setInstallationRequired(false);
         } catch (error) {
-            setSubmitMessage({ type: 'error', text: 'Failed to send quote request. Please try again.' });
+            setSubmitMessage({
+                type: 'error',
+                text: error instanceof Error
+                    ? error.message
+                    : 'Failed to send quote request. Please try again.',
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -105,9 +119,11 @@ export default function CartPage() {
 
     const updateQuantity = (id: string, quantity: number) => {
         if (quantity <= 0) {
-            setItems(items.filter(item => item.id !== id));
+            setItems((currentItems) => currentItems.filter(item => item.id !== id));
         } else {
-            setItems(items.map(item => item.id === id ? { ...item, quantity } : item));
+            setItems((currentItems) =>
+                currentItems.map(item => item.id === id ? { ...item, quantity } : item)
+            );
         }
     };
 
@@ -126,7 +142,7 @@ export default function CartPage() {
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px' }} className="flex flex-col gap-8">
 
                 {items.length === 0 ? (
-                    <p className="text-gray-600">Your cart is empty. <Link href="/" className="text-blue-600">Continue shopping</Link></p>
+                    <p className="text-gray-600">Your cart is empty. <Link href="/products" className="text-blue-600">Continue shopping</Link></p>
                 ) : (
                     <div className="space-y-8">
                         <div className="space-y-4">
@@ -140,10 +156,13 @@ export default function CartPage() {
                                         display: 'flex',
                                         gap: '12px'
                                     }}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded" />
                                     <div className="flex-1">
                                         <h3 className="font-semibold text-lg">{item.name}</h3>
-                                        <p className="text-gray-600">${item.price.toFixed(2)}/m2</p>
+                                        <p className="text-gray-600">
+                                            {item.price > 0 ? `$${item.price.toFixed(2)}/m2` : 'Price on request'}
+                                        </p>
                                         <p className="text-sm text-gray-500 mt-1">{item.sqmPerBox} sqm per box</p>
                                         <div className="flex gap-2 mt-2 items-center">
                                             <input type="number" min="0" step="1" value={item.quantity} onChange={(e) => updateQuantity(item.id, parseFloat(e.target.value) || 0)} className="px-3 py-1 border rounded w-20" />
@@ -151,7 +170,9 @@ export default function CartPage() {
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end justify-between">
-                                        <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-semibold">
+                                            {item.price > 0 ? `$${(item.price * item.quantity).toFixed(2)}` : 'TBC'}
+                                        </p>
                                         <button onClick={() => updateQuantity(item.id, 0)} className="text-red-600 hover:underline">Remove</button>
                                     </div>
                                 </div>
@@ -209,6 +230,16 @@ export default function CartPage() {
                                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                                                 />
                                             </div>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label className="block text-sm font-semibold mb-2">Address</label>
+                                            <input
+                                                type="text"
+                                                value={detailAddress}
+                                                onChange={(e) => setAddress(e.target.value)}
+                                                placeholder="Enter street address"
+                                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                            />
                                         </div>
                                     </div>
 

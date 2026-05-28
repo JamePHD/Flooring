@@ -11,7 +11,7 @@ type Entry = {
   is_residential?: boolean | null;
   is_commercial?: boolean | null;
   product_code?: string | null;
-  [key: string]: any;
+  [key: string]: string | number | null | undefined;
 };
 
 type ProductForm = {
@@ -80,6 +80,10 @@ export default function AdminPage() {
       }
       return left > right ? -1 : 1;
     });
+
+  function toFormText(value: string | number | null | undefined) {
+    return value?.toString() ?? "";
+  }
 
   function loadProductFromEntry(entry: Entry): ProductForm {
     return {

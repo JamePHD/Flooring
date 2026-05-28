@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ProductActions from "./product-actions";
 import { createServerClient } from "@/src/lib/supabase/server";
+import { StoredCompareProduct } from "@/app/lib/local-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +80,16 @@ export default async function ProductDrilldownPage({
   const images = galleryImages.length > 0 ? galleryImages : ["/products/woodfloor.jpg"];
   const priceLabel = getPriceLabel(activeVariants);
   const attributesByGroup = groupAttributes(product.product_attributes);
+  const cartItem = {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: getLowestPrice(activeVariants),
+    quantity: 1,
+    image: images[0],
+    sqmPerBox: 1,
+  };
+  const compareProduct = createCompareProduct(product, category);
 
   return (
     <main className="flex-1 bg-white">
@@ -145,12 +157,7 @@ export default async function ProductDrilldownPage({
             ) : null}
           </div>
 
-          <Link
-            href="/cart"
-            className="mt-8 inline-flex h-12 items-center justify-center bg-[#0B6A6A] px-8 text-sm font-bold text-white transition hover:bg-[#109494]"
-          >
-            Add to Quote
-          </Link>
+          <ProductActions cartItem={cartItem} compareProduct={compareProduct} />
 
           <div className="mt-10">
             <h2 className="text-xl font-bold text-[#0B6A6A]">Available variants</h2>
@@ -292,15 +299,25 @@ async function getProductPageData(slug: string): Promise<{
 }
 
 function getPriceLabel(variants: ProductVariant[]) {
+  const lowestPrice = getLowestPrice(variants);
+
+  if (lowestPrice <= 0) {
+    return "Price on request";
+  }
+
+  return `From ${formatCurrency(lowestPrice)}`;
+}
+
+function getLowestPrice(variants: ProductVariant[]) {
   const prices = variants
     .flatMap((variant) => [variant.price_per_sqm, variant.price_per_unit])
     .filter((price): price is number => typeof price === "number" && price > 0);
 
   if (prices.length === 0) {
-    return "Price on request";
+    return 0;
   }
 
-  return `From ${formatCurrency(Math.min(...prices))}`;
+  return Math.min(...prices);
 }
 
 function formatVariantPrice(variant: ProductVariant) {
@@ -357,4 +374,32 @@ function formatAttributeValue(value: string) {
   }
 
   return value;
+}
+
+function createCompareProduct(
+  product: ProductRow,
+  category: ProductCategory | null | undefined
+): StoredCompareProduct {
+  const compareProduct: StoredCompareProduct = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    code: product.slug,
+    brand: product.brand,
+    description: product.description || product.short_description,
+    imageUrl: product.image_url,
+    categoryName: category?.name || null,
+    categorySlug: category?.slug || null,
+    isResidential: product.is_residential ?? false,
+    isCommercial: product.is_commercial ?? false,
+  };
+
+  for (const productAttribute of product.product_attributes) {
+    const attribute = productAttribute.attributes;
+    if (attribute?.slug) {
+      compareProduct[attribute.slug] = formatAttributeValue(productAttribute.value);
+    }
+  }
+
+  return compareProduct;
 }
