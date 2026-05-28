@@ -15,16 +15,9 @@ export default function Footer() {
               <p className="text-sm">Sydney's premier online flooring specialists with expert advice and fast delivery.</p>
             </div>
 
-            {/* Shop */}
+
             <div>
-              <h4 className="font-bold text-white mb-4">Shop</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-blue-400 transition">Laminate Flooring</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">Engineered Flooring</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">Vinyl Flooring</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">Solid Flooring</Link></li>
-                <li><Link href="#" className="hover:text-blue-400 transition">Accessories</Link></li>
-              </ul>
+
             </div>
 
             {/* Company */}
