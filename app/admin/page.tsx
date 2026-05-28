@@ -426,7 +426,7 @@ export default function AdminPage() {
         {/* Main Body */}
         <div style={{ maxWidth: '960px', margin: '0 auto', padding: '32px 16px' }} className="flex flex-col gap-8">
           {/* Add Product Form */}
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+          <div style={{ color: "#445152", border: '1px solid #445152', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
             {/* Title */}
             <div style={{ marginBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add Product</h2>
@@ -442,6 +442,7 @@ export default function AdminPage() {
                   name="name" 
                   aria-invalid={productError ? 'true' : 'false'}
                   disabled={productIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='category'>
@@ -462,6 +463,7 @@ export default function AdminPage() {
                   name="brand" 
                   aria-invalid={productError ? 'true' : 'false'}
                   disabled={productIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='description'>
@@ -471,6 +473,7 @@ export default function AdminPage() {
                   name="description" 
                   aria-invalid={productError ? 'true' : 'false'}
                   disabled={productIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='short_description'>
@@ -480,6 +483,7 @@ export default function AdminPage() {
                   name="short_description" 
                   aria-invalid={productError ? 'true' : 'false'}
                   disabled={productIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='image_url'>
@@ -490,6 +494,7 @@ export default function AdminPage() {
                   name="image_url"
                   aria-invalid={productError ? 'true' : 'false'}
                   disabled={productIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='is_active'>
@@ -528,7 +533,7 @@ export default function AdminPage() {
             </form>
           </div>
           {/* Existing Products List */}
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+          <div style={{ color: "#445152", border: '1px solid #445152', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
             {/* Title */}
             <div style={{ marginBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Existing Products</h2>
@@ -542,7 +547,7 @@ export default function AdminPage() {
                   value={filterText}
                   onChange={(e) => setFilterText(e.target.value)}
                   placeholder="Search by name"
-                  style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
+                  style={{ color: "#738081",padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
                 />
               </label>
             </div>
@@ -575,7 +580,7 @@ export default function AdminPage() {
             </div>
           </div>
           {/* Add Variant Form */}
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+          <div style={{ color: "#445152", border: '1px solid #445152', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
             {/* Title */}
             <div style={{ marginBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add Product Variant</h2>
@@ -583,7 +588,7 @@ export default function AdminPage() {
             </div>
             {/* Form */}
             <form action={submitVariant} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <label htmlFor='sku'>
+              <label htmlFor='sku' >
                 SKU:
                 <input
                   type="text"
@@ -591,6 +596,7 @@ export default function AdminPage() {
                   name="sku" 
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='product_id'>
@@ -611,6 +617,7 @@ export default function AdminPage() {
                   name="colour_name" 
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='colour_hex'>
@@ -621,6 +628,7 @@ export default function AdminPage() {
                   name="colour_hex" 
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='size_label'>
@@ -631,6 +639,7 @@ export default function AdminPage() {
                   name="size_label" 
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='price_per_sqm'>
@@ -642,6 +651,7 @@ export default function AdminPage() {
                   step="0.50"
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='price_per_unit'>
@@ -653,6 +663,7 @@ export default function AdminPage() {
                   step="0.50"
                   aria-invalid={variantError ? 'true' : 'false'}
                   disabled={variantIsPending}
+                  style={{ border: '2px solid #889192', borderRadius: 6}}
                 />
               </label>
               <label htmlFor='image_url'>
@@ -681,7 +692,7 @@ export default function AdminPage() {
             </form>
           </div>
           {/* Existing Variants List */}
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+          <div style={{ color: "#445152", border: '1px solid #445152', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
             {/* Title */}
             <div style={{ marginBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Existing Variants</h2>
@@ -694,7 +705,7 @@ export default function AdminPage() {
                 <input
                   value={variantFilterText}
                   onChange={(e) => setVariantFilterText(e.target.value)}
-                  placeholder="Search by sku"
+                  placeholder="Search by SKU"
                   style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
                 />
               </label>
