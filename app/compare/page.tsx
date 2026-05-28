@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import CompareFilter from "./filter";
 import {
@@ -72,7 +72,7 @@ export default function ComparisonPage() {
               name: product?.name || "",
               brand: product?.brand || null,
               description: product?.description || null,
-              imageUrl: product?.image_url || null,
+              image: product.image_url ?? "/products/woodfloor.jpg",
               categoryName: category?.name || null,
               categorySlug: category?.slug || null,
               isResidential: product?.is_residential ?? false,
@@ -134,6 +134,12 @@ export default function ComparisonPage() {
     fetchProducts();
   }, []);
 
+  const expandedComparedProducts = useMemo(() => {
+    return comparedProducts.map((product) => {
+      return dbProducts.find((variant) => String(variant.id) === String(product.id)) ?? product;
+    });
+  }, [comparedProducts, dbProducts]);
+
   const addProductToCompare = (product: StoredCompareProduct) => {
     setComparedProducts((current) => {
       if (current.find((item) => String(item.id) === String(product.id))) return current;
@@ -152,7 +158,7 @@ export default function ComparisonPage() {
     
   };
 
-  const hasComparedProducts = comparedProducts.length > 0;
+  const hasComparedProducts = expandedComparedProducts.length > 0;
 
   return (
     <div>
@@ -175,7 +181,7 @@ export default function ComparisonPage() {
               <thead>
                 <tr>
                   <th style={{ border: "1px solid #000000", padding: 12, background: "#f3f4f6", minWidth: 180 }}></th>
-                  {comparedProducts.map((product) => (
+                  {expandedComparedProducts.map((product) => (
                     <th key={product.id} style={{ border: "1px solid #000000", padding: 12, background: "#f3f4f6", minWidth: 220, position: "relative" }}>
                       <button onClick={() => removeProducts(product.id)} style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: "50%", background: "#696969", border: "none", fontSize: 14, fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         x
@@ -183,8 +189,8 @@ export default function ComparisonPage() {
                       <div style={{ width: "100%", height: 120, background: "#e5e7eb", borderRadius: 8, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <span style={{ color: "#9ca3af", fontSize: 14 }}>Product Image</span>
                       </div>
-                      <div style={{ fontWeight: 300, fontSize: 18, color: "#000000" }}>{product.name}</div>
-                      <div style={{ fontSize: 14, color: "#000000" }}>{product.code}</div>
+                      <div style={{ fontWeight: 300, fontSize: 18, color: "#000000" }}>{product.displayName ?? product.name ?? "Unknown Product"}</div>
+                      <div style={{ fontSize: 14, color: "#000000" }}>{product.code ?? product.variantSku ?? "-"}</div>
                     </th>
                   ))}
                 </tr>
@@ -193,7 +199,7 @@ export default function ComparisonPage() {
                 {CompareCategories.map((category) => (
                   <tr key={category.key}>
                     <td style={{ border: "1px solid #000000", padding: 12, fontWeight: 700, background: "#f9fafb", color: "#000000", textAlign: "center" }}>{category.label}</td>
-                    {comparedProducts.map((product) => (
+                    {expandedComparedProducts.map((product) => (
                       <td key={`${product.id}-${category.key}`} style={{ border: "1px solid #000000", padding: 12, color: "#000000" }}>
                         {product[category.key] ?? "-"}
                       </td>

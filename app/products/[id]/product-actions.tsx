@@ -1,23 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   addStoredCartItem,
-  addStoredCompareProduct,
   getStoredCompareProducts,
+  setStoredCompareProducts,
   StoredCartItem,
   StoredCompareProduct,
 } from "@/app/lib/local-storage";
 
+interface ProductVariantOption {
+  id: string;
+  sku: string;
+  colour_name: string | null;
+  price_per_sqm: number | null;
+  price_per_unit: number | null;
+  image_url: string | null;
+}
+
 interface ProductActionsProps {
-  cartItem: StoredCartItem;
-  compareProduct: StoredCompareProduct;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    image_url: string | null;
+  };
+  activeVariants: ProductVariantOption[];
+  compareProducts: StoredCompareProduct[];
 }
 
 export default function ProductActions({
-  cartItem,
-  compareProduct,
+  product,
+  activeVariants,
+  compareProducts,
 }: ProductActionsProps) {
+  const [selectedVariantId, setSelectedVariantId] = useState(activeVariants[0]?.id ?? product.id);
   const [message, setMessage] = useState<string | null>(null);
 
   function showMessage(nextMessage: string) {
@@ -25,32 +42,81 @@ export default function ProductActions({
     window.setTimeout(() => setMessage(null), 2500);
   }
 
+  const selectedVariant = useMemo(
+    () => activeVariants.find((variant) => variant.id === selectedVariantId) ?? null,
+    [activeVariants, selectedVariantId]
+  );
+
   function addToQuote() {
+    const variantPrice = selectedVariant
+      ? selectedVariant.price_per_sqm && selectedVariant.price_per_sqm > 0
+        ? selectedVariant.price_per_sqm
+        : selectedVariant.price_per_unit && selectedVariant.price_per_unit > 0
+          ? selectedVariant.price_per_unit
+          : 0
+      : 0;
+
+    const cartItem: StoredCartItem = {
+      id: selectedVariant?.id ?? product.id,
+      slug: product.slug,
+      name: selectedVariant?.colour_name
+        ? `${product.name} - ${selectedVariant.colour_name}`
+        : product.name,
+      price: variantPrice,
+      quantity: 1,
+      image: selectedVariant?.image_url ?? product.image_url ?? "/products/woodfloor.jpg",
+      sqmPerBox: 1,
+    };
+
     addStoredCartItem(cartItem);
-    showMessage("Saved to your quote cart on this device.");
+    showMessage("Saved to your cart on this device.");
   }
 
   function addToCompare() {
-    const beforeCount = getStoredCompareProducts().length;
-    const nextProducts = addStoredCompareProduct(compareProduct);
-
-    showMessage(
-      nextProducts.length > beforeCount
-        ? "Saved to your compare list on this device."
-        : "This product is already in your compare list."
+    const existingProducts = getStoredCompareProducts();
+    const uniqueProducts = compareProducts.filter(
+      (item) =>
+        !existingProducts.some((storedProduct) => String(storedProduct.id) === String(item.id))
     );
+
+    if (uniqueProducts.length === 0) {
+      showMessage("This product is already in your compare list.");
+      return;
+    }
+
+    const nextProducts = [...existingProducts, ...uniqueProducts];
+    setStoredCompareProducts(nextProducts);
+    showMessage("Added to your compare list.");
   }
 
   return (
     <div className="mt-8">
+      {activeVariants.length > 0 ? (
+        <label className="mb-3 block text-sm font-semibold text-gray-700">
+          Select variant
+          <select
+            value={selectedVariantId}
+            onChange={(event) => setSelectedVariantId(event.target.value)}
+            className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800"
+          >
+            {activeVariants.map((variant) => (
+              <option key={variant.id} value={variant.id}>
+                {variant.colour_name || "Standard"} · SKU {variant.sku}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={addToQuote}
           className="inline-flex h-12 items-center justify-center bg-[#0B6A6A] px-8 text-sm font-bold text-white transition hover:bg-[#109494]"
         >
-          Add to Quote
+          Add to Cart
         </button>
+
         <button
           type="button"
           onClick={addToCompare}

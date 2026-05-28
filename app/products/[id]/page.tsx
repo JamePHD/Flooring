@@ -12,6 +12,7 @@ interface ProductCategory {
 }
 
 interface ProductVariant {
+  id: string;
   sku: string;
   colour_name: string | null;
   price_per_sqm: number | null;
@@ -80,16 +81,7 @@ export default async function ProductDrilldownPage({
   const images = galleryImages.length > 0 ? galleryImages : ["/products/woodfloor.jpg"];
   const priceLabel = getPriceLabel(activeVariants);
   const attributesByGroup = groupAttributes(product.product_attributes);
-  const cartItem = {
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    price: getLowestPrice(activeVariants),
-    quantity: 1,
-    image: images[0],
-    sqmPerBox: 1,
-  };
-  const compareProduct = createCompareProduct(product, category);
+  const compareProducts = createCompareProducts(product, category);
 
   return (
     <main className="flex-1 bg-white">
@@ -157,7 +149,16 @@ export default async function ProductDrilldownPage({
             ) : null}
           </div>
 
-          <ProductActions cartItem={cartItem} compareProduct={compareProduct} />
+          <ProductActions
+            product={{
+              id: product.id,
+              name: product.name,
+              slug: product.slug,
+              image_url: product.image_url,
+            }}
+            activeVariants={activeVariants}
+            compareProducts={compareProducts}
+          />
 
           <div className="mt-10">
             <h2 className="text-xl font-bold text-[#0B6A6A]">Available variants</h2>
@@ -263,7 +264,7 @@ async function getProductPageData(slug: string): Promise<{
   const { data: product, error } = await supabase
     .from("products")
     .select(
-      "id, name, slug, brand, description, short_description, image_url, is_residential, is_commercial, categories(name, slug), product_variants(sku, colour_name, price_per_sqm, price_per_unit, stock_status, image_url, is_active), product_attributes(value, attributes(name, slug, unit, attribute_groups(name, slug)))"
+      "id, name, slug, brand, description, short_description, image_url, is_residential, is_commercial, categories(name, slug), product_variants(id, sku, colour_name, price_per_sqm, price_per_unit, stock_status, image_url, is_active), product_attributes(value, attributes(name, slug, unit, attribute_groups(name, slug)))"
     )
     .eq("slug", slug)
     .eq("is_active", true)
@@ -376,22 +377,39 @@ function formatAttributeValue(value: string) {
   return value;
 }
 
-function createCompareProduct(
+function createCompareProducts(
   product: ProductRow,
   category: ProductCategory | null | undefined
+): StoredCompareProduct[] {
+  const variants = product.product_variants.filter((variant) => variant.is_active);
+
+  if (variants.length === 0) {
+    return [createCompareProductEntry(product, category, null)];
+  }
+  return variants.map((variant) => createCompareProductEntry(product, category, variant));
+}
+
+function createCompareProductEntry(
+  product: ProductRow,
+  category: ProductCategory | null | undefined,
+  variant: ProductVariant | null
 ): StoredCompareProduct {
   const compareProduct: StoredCompareProduct = {
-    id: product.id,
+    id: variant?.id ?? product.id,
+    parentProductId: product.id,
     name: product.name,
     slug: product.slug,
-    code: product.slug,
+    code: variant?.sku ?? product.slug,
     brand: product.brand,
     description: product.description || product.short_description,
-    imageUrl: product.image_url,
+    imageUrl: variant?.image_url || product.image_url,
     categoryName: category?.name || null,
     categorySlug: category?.slug || null,
     isResidential: product.is_residential ?? false,
     isCommercial: product.is_commercial ?? false,
+    displayName: variant?.colour_name ? `${product.name} ${variant.colour_name}` : product.name,
+    colourName: variant?.colour_name ?? null,
+
   };
 
   for (const productAttribute of product.product_attributes) {
