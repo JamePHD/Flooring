@@ -30,6 +30,19 @@ export default function ComparisonPage() {
   const [comparedProducts, setComparedProducts] = useState<any[]>([]);
   const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedCompare, setHasLoadedCompare] = useState(false);
+
+  useEffect(() => {
+  setComparedProducts(getStoredCompareProducts());
+  setHasLoadedCompare(true);
+  }, []);
+
+
+  useEffect(() => {
+  if (hasLoadedCompare) {
+    setStoredCompareProducts(comparedProducts);
+  }
+  }, [hasLoadedCompare, comparedProducts]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -39,7 +52,7 @@ export default function ComparisonPage() {
        
         const { data: productRows, error } = await supabase
           .from('product_variants')
-          .select('id, sku, colour_name, products (id, name, slug, brand, short_description, description, image_url, is_residential, is_commercial, created_at, is_active, categories(name, slug), product_attributes(value, attributes(name, slug)))');
+          .select('id, sku, colour_name, size_label, products (id, name, slug, brand, short_description, description, image_url, is_residential, is_commercial, created_at, is_active, categories(name, slug), product_attributes(value, attributes(name, slug)))');
 
         if (error) throw error;
 
@@ -64,12 +77,27 @@ export default function ComparisonPage() {
               categorySlug: category?.slug || null,
               isResidential: product?.is_residential ?? false,
               isCommercial: product?.is_commercial ?? false,
-              thickness: "-",
+              "thickness": "-",
               "plank-width": "-",
               "plank-length": "-",
               warranty: "-",
               range: product?.name || "-",
             };
+
+            if (variant.size_label && typeof variant.size_label === "string") {
+              const cleanSize = variant.size_label.toLowerCase().replace(/mm/g, "").trim(); 
+              const parts = cleanSize.split("×"); 
+
+              if (parts.length === 3) {
+          
+                mappedProduct["plank-length"] = parts[0].trim();
+                mappedProduct["plank-width"] = parts[1].trim();
+                mappedProduct["thickness"] = parts[2].trim();
+              } else if (parts.length === 2) {
+                mappedProduct["plank-length"] = parts[0].trim();
+                mappedProduct["thickness"] = parts[1].trim();
+              }
+            }
 
             if (product && product.product_attributes && Array.isArray(product.product_attributes)) {
               product.product_attributes.forEach((attrLink: any) => {
@@ -81,14 +109,15 @@ export default function ComparisonPage() {
                 if (attrSlug && attrValue) {
                   const cleanSlug = String(attrSlug).trim().toLowerCase();
 
-                  if (cleanSlug === "thickness") mappedProduct["thickness"] = attrValue;
-                  else if (cleanSlug === "plank-width" || cleanSlug === "plankwidth" || cleanSlug === "width") mappedProduct["plank-width"] = attrValue;
-                  else if (cleanSlug === "plank-length" || cleanSlug === "planklength" || cleanSlug === "length") mappedProduct["plank-length"] = attrValue;
+                  if (cleanSlug === "thickness" && mappedProduct["thickness"] === "-") mappedProduct["thickness"] = attrValue;
+                  else if ((cleanSlug === "plank-width" || cleanSlug === "plankwidth" || cleanSlug === "width") && mappedProduct["plank-width"] === "-") mappedProduct["plank-width"] = attrValue;
+                  else if ((cleanSlug === "plank-length" || cleanSlug === "planklength" || cleanSlug === "length") && mappedProduct["plank-length"] === "-") mappedProduct["plank-length"] = attrValue;
                   else if (cleanSlug === "warranty") mappedProduct["warranty"] = attrValue;
                   else if (cleanSlug === "range") mappedProduct["range"] = attrValue;
                 }
               });
             }
+
 
             return mappedProduct;
           });
@@ -108,12 +137,19 @@ export default function ComparisonPage() {
   const addProductToCompare = (product: StoredCompareProduct) => {
     setComparedProducts((current) => {
       if (current.find((item) => String(item.id) === String(product.id))) return current;
-      return [...current, product];
+      const updated = [...current, product];
+      setStoredCompareProducts(updated);
+      return updated;
     });
   };
 
   const removeProducts = (id: string) => {
-    setComparedProducts((current) => current.filter((product) => product.id !== id));
+    setComparedProducts((current) => {
+      const updated = current.filter((product) => String(product.id) !== String(id));
+      setStoredCompareProducts(updated);
+      return updated;
+    });
+    
   };
 
   const hasComparedProducts = comparedProducts.length > 0;
