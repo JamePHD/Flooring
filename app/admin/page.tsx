@@ -121,21 +121,7 @@ export default function AdminPage() {
   // Delete product action
   const [deleteProductError, submitProductDelete, deleteProductIsPending] = useActionState(
     async (previousState: any, formData: FormData) => {
-      // Get product name from form data
-      const productName = formData.get('name') as string;
-      const trimmedName = productName.trim();
-      if (!trimmedName) {
-        return new Error('Product name is required for deletion');
-      }
-      // Delete product from database
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('name', trimmedName);
-      // Handle deletion error
-      if (error) {
-        return new Error('Error deleting product from database: ' + error.message);
-      }
+      
     },
     null // Initial state
   );
@@ -335,6 +321,24 @@ export default function AdminPage() {
       if (left === right) return 0;
       return left < right ? -1 : 1;
     });
+  
+  // Handle product deletion
+  async function removeProduct(name: string) {
+    // Get product name
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      return new Error('Product name is required for deletion');
+    }
+    // Delete product from database
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('name', trimmedName);
+    // Handle deletion error
+    if (error) {
+      return new Error('Error deleting product from database: ' + error.message);
+    }
+  }
 
   // Return markup for admin page
   return session ? (
@@ -449,7 +453,50 @@ export default function AdminPage() {
           </div>
           {/* Existing Products List */}
           <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
-            
+            {/* Title */}
+            <div style={{ marginBottom: 12 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Existing Products</h2>
+              <p style={{ margin: '6px 0 0 0', color: '#374151' }}>View, filter and delete products from the database.</p>
+            </div>
+            {/* Product Filter */}
+            <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 220 }}>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>Filter products</span>
+                <input
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                  placeholder="Search by name"
+                  style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
+                />
+              </label>
+            </div>
+            {/* Products Table */}
+            <div style={{ overflowX: 'auto', maxHeight: '420px', overflowY: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+                <thead>
+                  <tr>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Name</th>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Category</th>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Brand</th>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedProducts.map((it) => (
+                    <tr key={it.name} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      <td style={{ padding: '10px' }}>{it.name}</td>
+                      <td style={{ padding: '10px' }}>{categories.find((c) => c.id === it.category_id)?.name ?? ''}</td>
+                      <td style={{ padding: '10px' }}>{it.brand ?? ''}</td>
+                      <td style={{ padding: '10px', display: 'flex', gap: 8 }}>
+                        <button onClick={() => removeProduct(it.name)} style={{ padding: '6px 10px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4 }}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>
@@ -472,154 +519,3 @@ export default function AdminPage() {
       </main>
     );
 }
-/*
-          </div>
-            <div style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                padding: '16px'}}>
-                <form onSubmit={addItem} style={{ display: 'grid', gap: 16 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 12 }}>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                        <span style={{ fontWeight: 600 }}>Product Name</span>
-                        <input
-                          value={product.productName}
-                          onChange={(e) => setProduct((prev) => ({ ...prev, productName: e.target.value }))}
-                          placeholder="Product Name"
-                          type="text"
-                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%' }}
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                        <span style={{ fontWeight: 600 }}>Brand</span>
-                        <input
-                          value={product.brand}
-                          onChange={(e) => setProduct((prev) => ({ ...prev, brand: e.target.value }))}
-                          placeholder="Brand"
-                          type="text"
-                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%' }}
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                        <span style={{ fontWeight: 600 }}>Description</span>
-                        <textarea
-                          value={product.description}
-                          onChange={(e) => setProduct((prev) => ({ ...prev, description: e.target.value }))}
-                          placeholder="Description"
-                          rows={4}
-                          style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 6, width: '100%', resize: 'vertical' }}
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                        <span style={{ fontWeight: 600 }}>Residential</span>
-                        <input
-                          type="checkbox"
-                          checked={product.isResidential}
-                          onChange={(e) => setProduct((prev) => ({ ...prev, isResidential: e.target.checked }))}
-                          style={{ width: 18, height: 18 }}
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-                        <span style={{ fontWeight: 600 }}>Commercial</span>
-                        <input
-                          type="checkbox"
-                          checked={product.isCommercial}
-                          onChange={(e) => setProduct((prev) => ({ ...prev, isCommercial: e.target.checked }))}
-                          style={{ width: 18, height: 18 }}
-                        />
-                      </label>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
-                        <button type="button" disabled={loading} onClick={() => {
-                          setProduct(initialProduct);
-                          setEditingId(null);
-                        }} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc' }}>
-                          Reset
-                        </button>
-                        <button type="submit" disabled={loading} style={{ padding: '10px 18px', borderRadius: 6, border: 'none', background: '#0d5a57', color: 'white' }}>
-                          {editingId ? 'Update Product' : 'Add Product'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                padding: '16px'}}>
-
-                <div style={{ marginBottom: 12 }}>
-                  <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Existing Products</h2>
-                  <p style={{ margin: '6px 0 0 0', color: '#374151' }}>View, filter, sort, edit, or delete products from the database.</p>
-                </div>
-
-                {loading && <div>Loading...</div>}
-
-                <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
-                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 220 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600 }}>Filter products</span>
-                    <input
-                      value={filterText}
-                      onChange={(e) => setFilterText(e.target.value)}
-                      placeholder="Search by name or code"
-                      style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
-                    />
-                  </label>
-                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 180 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600 }}>Sort by</span>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as "name" | "product_code")}
-                      style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}
-                    >
-                      <option value="name">Product Name</option>
-                      <option value="product_code">Product Code</option>
-                    </select>
-                  </label>
-                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 180 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600 }}>Sort direction</span>
-                    <select
-                      value={sortDirection}
-                      onChange={(e) => setSortDirection(e.target.value as "asc" | "desc")}
-                      style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}
-                    >
-                      <option value="asc">Ascending</option>
-                      <option value="desc">Descending</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div style={{ overflowX: 'auto', maxHeight: '420px', overflowY: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
-                    <thead>
-                      <tr>
-                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Name</th>
-                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product Code</th>
-                        <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {displayedProducts.map((it) => (
-                        <tr key={it.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                          <td style={{ padding: '10px' }}><strong>{it.name}</strong></td>
-                          <td style={{ padding: '10px' }}>{it.product_code ?? ''}</td>
-                          <td style={{ padding: '10px', display: 'flex', gap: 8 }}>
-                            <button onClick={() => editItem(it)} style={{ padding: '6px 10px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4 }}>
-                              Edit
-                            </button>
-                            <button onClick={() => removeItem(it.id)} style={{ padding: '6px 10px' }}>
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-            </div>
-        </div>
-    </main>
-  );
-}*/

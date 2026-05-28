@@ -85,7 +85,7 @@ export default async function ProductDrilldownPage({
 
   return (
     <main className="flex-1 bg-white">
-      <section className="border-b border-gray-200 bg-[#0B6A6A] px-4 py-10 text-white sm:px-6">
+      <section style={{ background: "linear-gradient(to right, #0d5a57, #118b85, #15c4c4)" }} className="border-b border-gray-200 px-4 py-10 text-white sm:px-6">
         <div className="mx-auto max-w-7xl">
           <Link href="/products" className="text-sm font-semibold text-white/80 hover:text-white">
             Back to products
