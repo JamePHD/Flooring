@@ -2,6 +2,7 @@
 
 import { createClient, Session } from '@supabase/supabase-js';
 import { useEffect, useState, useActionState } from 'react';
+import Link from 'next/link';
 
 const supabaseURL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -77,7 +78,24 @@ export default function SignInPage() {
         }
     }
 
-    return (
+    return session ? (
+        <main className="flex-1 bg-white">
+            <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Sign In</h1>
+                <p style={{ fontSize: '16px', opacity: 0.9, margin: 0 }}>Access your account to manage products.</p>
+            </section>
+            <div style={{ maxWidth: '400px', margin: '40px auto', padding: '0 16px' }}>
+                <div style={{
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    padding: '16px'}}>
+                    <p className="text-sm text-gray-700">You are signed in as {session.user.email}.</p>
+                    <Link href="/admin" className="block w-full mt-3 text-center hover:underline" style={{color: '#15c4c4'}}>Return to Admin Panel</Link>
+                </div>
+            </div>
+        </main>
+    ) : (
         <main className="flex-1 bg-white">
             <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Sign In</h1>
