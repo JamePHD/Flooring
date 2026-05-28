@@ -11,8 +11,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 const supabase = createClient(supabaseURL, supabaseAnonKey);
 
-// Define category entry type
+// Define category type
 type Category = {
+  id: string;
+  name: string;
+};
+
+// Define product reference type for variants
+type ProductReference = {
   id: string;
   name: string;
 };
@@ -45,7 +51,7 @@ const initialProduct: Product = {
 };
 
 type Variant = {
-  product_id: number;
+  product_id: string;
   sku: string;
   colour_name: string;
   colour_hex: string;
@@ -57,7 +63,7 @@ type Variant = {
 };
 
 const initialVariant: Variant = {
-  product_id: 0,
+  product_id: "",
   sku: "",
   colour_name: "",
   colour_hex: "",
@@ -115,13 +121,37 @@ export default function AdminPage() {
   // Add variant to database action
   const [variantError, submitVariant, variantIsPending] = useActionState(
     async (previousState: any, formData: FormData) => {
-    },
-    null // Initial state
-  );
-  // Delete product action
-  const [deleteProductError, submitProductDelete, deleteProductIsPending] = useActionState(
-    async (previousState: any, formData: FormData) => {
-      
+      // Break down form data into product fields
+      const newVariant = {
+        product_id: formData.get('product_id') as string,
+        sku: formData.get('sku') as string,
+        colour_name: formData.get('colour_name') as string,
+        colour_hex: formData.get('colour_hex') as string,
+        size_label: formData.get('size_label') as string,
+        price_per_sqm: formData.get('price_per_sqm') as number | null,
+        price_per_unit: formData.get('price_per_unit') as number | null,
+        image_url: formData.get('image_url') as string,
+        is_active: formData.get('is_active') === 'on',
+      };
+      // Sanitize data input
+      newVariant.sku = newVariant.sku.trim();
+      newVariant.colour_name = newVariant.colour_name.trim();
+      newVariant.colour_hex = newVariant.colour_hex.trim();
+      newVariant.size_label = newVariant.size_label.trim();
+      newVariant.image_url = newVariant.image_url.trim();
+      newVariant.product_id = productReferences.find(p => p.name === newVariant.product_id)?.id ?? '';
+      // Validate required fields
+      if (!newVariant.sku) { return new Error('Variant SKU is required'); }
+      if (!newVariant.product_id) { return new Error('Variant product is required'); }
+      if (newVariant.product_id === '') { return new Error('Selected product is invalid'); }
+      // Insert new variant into database
+      const { error } = await supabase
+        .from('product_variants')
+        .insert(newVariant);
+      // Handle insertion error
+      if (error) {
+        return new Error('Error adding variant to database: ' + error.message);
+      }
     },
     null // Initial state
   );
@@ -148,14 +178,17 @@ export default function AdminPage() {
   );
   // Current list of products and variants in the database
   const [categories, setCategories] = useState<Category[]>([]);
+  const [productReferences, setProductReferences] = useState<ProductReference[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [variants, setVariants] = useState<Variant[]>([]);
 
   // List of options that require a dropdown
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedProduct, setSelectedProduct] = useState<string>('');
 
-  // TODO: See what of these need to stay
+  // Filter text for products and variants tables
   const [filterText, setFilterText] = useState("");
+  const [variantFilterText, setVariantFilterText] = useState("");
 
   // Setup on first render: fetch session and items from database
   useEffect(() => {
@@ -163,6 +196,7 @@ export default function AdminPage() {
     getInitialSession();
     // Get initial list of products and variants
     fetchCategories();
+    fetchProductReferences();
     fetchProducts();
     fetchVariants();
     // Subscribe to real-time changes in the products and variants tables
@@ -224,6 +258,30 @@ export default function AdminPage() {
       setCategories(data);
     } catch (error) {
         console.error('Error fetching categories:', error);
+    }
+  }
+
+  // Fetch reference products from database
+  async function fetchProductReferences() {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(
+          `
+          id,
+          name
+          `,
+        )
+        .order('name', { ascending: true })
+      // Handle error
+      if (error) {
+          throw error;
+      }
+      // Log data
+      console.log(data);
+      setProductReferences(data);
+    } catch (error) {
+        console.error('Error fetching product references:', error);
     }
   }
 
@@ -340,9 +398,27 @@ export default function AdminPage() {
     }
   }
 
+  // Handle variant deletion
+  async function removeVariant(sku: string) {
+    // Get variant SKU
+    const trimmedSku = sku.trim();
+    if (!trimmedSku) {
+      return new Error('Variant SKU is required for deletion');
+    }
+    // Delete variant from database
+    const { error } = await supabase
+      .from('product_variants')
+      .delete()
+      .eq('sku', trimmedSku);
+    // Handle deletion error
+    if (error) {
+      return new Error('Error deleting variant from database: ' + error.message);
+    }
+  }
+
   // Return markup for admin page
   return session ? (
-      <main className="flex-1">
+      <main className="flex-1 bg-white">
         {/* Header */}
         <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Admin Panel</h1>
@@ -498,10 +574,161 @@ export default function AdminPage() {
               </table>
             </div>
           </div>
+          {/* Add Variant Form */}
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+            {/* Title */}
+            <div style={{ marginBottom: 12 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add Product Variant</h2>
+              <p style={{ margin: '6px 0 0 0', color: '#374151' }}>Fill in the fields below to add or edit a product variant.</p>
+            </div>
+            {/* Form */}
+            <form action={submitVariant} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <label htmlFor='sku'>
+                SKU:
+                <input
+                  type="text"
+                  id="sku"
+                  name="sku" 
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='product_id'>
+                Product:
+                <select value={selectedProduct} name="product_id" id="product_id" onChange={(e) => setSelectedProduct(e.target.value)}>
+                  {/* Product options are populated dynamically */}
+                  <option value="" disabled>Select a product</option>
+                  {productReferences.map((product) => (
+                    <option key={product.id} value={product.name}>{product.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label htmlFor='colour_name'>
+                Colour Name:
+                <input
+                  type="text"
+                  id="colour_name"
+                  name="colour_name" 
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='colour_hex'>
+                Colour Hex:
+                <input
+                  type="text"
+                  id="colour_hex"
+                  name="colour_hex" 
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='size_label'>
+                Size Label:
+                <input
+                  type="text"
+                  id="size_label"
+                  name="size_label" 
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='price_per_sqm'>
+                Price per Square Meter:
+                <input
+                  type="number"
+                  id="price_per_sqm"
+                  name="price_per_sqm"
+                  step="0.50"
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='price_per_unit'>
+                Price per Unit:
+                <input
+                  type="number"
+                  id="price_per_unit"
+                  name="price_per_unit"
+                  step="0.50"
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='image_url'>
+                Image URL:
+                <input
+                  type="text"
+                  id="image_url"
+                  name="image_url"
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <label htmlFor='is_active'>
+                Active:
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  aria-invalid={variantError ? 'true' : 'false'}
+                  disabled={variantIsPending}
+                />
+              </label>
+              <button type="submit" disabled={variantIsPending} style={{ padding: '10px 18px', borderRadius: 6, border: 'none', background: '#0d5a57', color: 'white' }}>
+                {variantIsPending ? 'Submitting...' : 'Submit'}
+              </button>
+            </form>
+          </div>
+          {/* Existing Variants List */}
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', padding: '16px' }}>
+            {/* Title */}
+            <div style={{ marginBottom: 12 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Existing Variants</h2>
+              <p style={{ margin: '6px 0 0 0', color: '#374151' }}>View, filter and delete variants from the database.</p>
+            </div>
+            {/* Variants Filter */}
+            <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 220 }}>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>Filter variants</span>
+                <input
+                  value={variantFilterText}
+                  onChange={(e) => setVariantFilterText(e.target.value)}
+                  placeholder="Search by sku"
+                  style={{ padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', width: '100%' }}
+                />
+              </label>
+            </div>
+            {/* Variants Table */}
+            <div style={{ overflowX: 'auto', maxHeight: '420px', overflowY: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+                <thead>
+                  <tr>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>SKU</th>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Product</th>
+                    <th style={{ position: 'sticky', top: 0, background: 'white', zIndex: 2, textAlign: 'left', padding: '10px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedVariants.map((it) => (
+                    <tr key={it.sku} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      <td style={{ padding: '10px' }}>{it.sku}</td>
+                      <td style={{ padding: '10px' }}>{productReferences.find((c) => c.id === it.product_id)?.name ?? ''}</td>
+                      <td style={{ padding: '10px', display: 'flex', gap: 8 }}>
+                        <button onClick={() => removeVariant(it.sku)} style={{ padding: '6px 10px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4 }}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </main>
     ) : (
-      <main className="flex-1">
+      <main className="flex-1 bg-white">
         {/* Header */}
         <section style={{ background: 'linear-gradient(to right, #0d5a57, #118b85, #15c4c4)', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Admin Panel</h1>
