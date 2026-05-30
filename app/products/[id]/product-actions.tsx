@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   addStoredCartItem,
@@ -29,17 +29,23 @@ interface ProductActionsProps {
   compareProducts: StoredCompareProduct[];
 }
 
+interface NotificationMessage {
+  text: string;
+  linkText: string;
+  linkUrl: string;
+}
+
 export default function ProductActions({
   product,
   activeVariants,
   compareProducts,
 }: ProductActionsProps) {
   const [selectedVariantId, setSelectedVariantId] = useState(activeVariants[0]?.id ?? product.id);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<NotificationMessage | null>(null);
 
-  function showMessage(nextMessage: string) {
+  function showMessage(nextMessage: NotificationMessage) {
     setMessage(nextMessage);
-    window.setTimeout(() => setMessage(null), 2500);
+    window.setTimeout(() => setMessage(null), 5000);
   }
 
   const selectedVariant = useMemo(
@@ -52,9 +58,7 @@ export default function ProductActions({
       ? selectedVariant.price_per_sqm && selectedVariant.price_per_sqm > 0
         ? selectedVariant.price_per_sqm
         : selectedVariant.price_per_unit && selectedVariant.price_per_unit > 0
-          ? selectedVariant.price_per_unit
-          : 0
-      : 0;
+          ? selectedVariant.price_per_unit: 0: 0;
 
     const cartItem: StoredCartItem = {
       id: selectedVariant?.id ?? product.id,
@@ -69,7 +73,11 @@ export default function ProductActions({
     };
 
     addStoredCartItem(cartItem);
-    showMessage("Saved to your cart on this device.");
+    showMessage({
+    text: "Saved to your quote cart on this device.",
+    linkText: " -> Go to cart",
+    linkUrl: "/cart",
+    });
   }
 
   function addToCompare() {
@@ -80,13 +88,21 @@ export default function ProductActions({
     );
 
     if (uniqueProducts.length === 0) {
-      showMessage("This product is already in your compare list.");
+      showMessage({
+        text: "This product is already in your compare list.",
+        linkText: "View compare list →",
+        linkUrl: "/compare"
+      });
       return;
     }
 
     const nextProducts = [...existingProducts, ...uniqueProducts];
     setStoredCompareProducts(nextProducts);
-    showMessage("Added to your compare list.");
+    showMessage({
+      text: "Saved to your compare list on this device.",
+      linkText: "View compare list →",
+      linkUrl: "/compare"
+    });
   }
 
   return (
@@ -127,7 +143,15 @@ export default function ProductActions({
       </div>
 
       {message ? (
-        <p className="mt-3 text-sm font-semibold text-[#0B6A6A]">{message}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-[#0B6A6A]">
+          <span>{message.text}</span>
+          <Link 
+            href={message.linkUrl} 
+            className="underline transition text-[#109494] hover:text-[#0B6A6A]"
+          >
+            {message.linkText}
+          </Link>
+        </div>
       ) : null}
     </div>
   );
