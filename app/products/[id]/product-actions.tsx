@@ -75,7 +75,7 @@ export default function ProductActions({
     addStoredCartItem(cartItem);
     showMessage({
     text: "Saved to your quote cart on this device.",
-    linkText: " -> Go to cart",
+    linkText: "View cart →",
     linkUrl: "/cart",
     });
   }

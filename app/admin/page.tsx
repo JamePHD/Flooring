@@ -4,6 +4,7 @@
 import { createClient, Session } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useEffect, useState, useActionState } from "react";
+import SignOutButton from './signOut';
 
 // Setup Supabase client
 const supabaseURL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
@@ -435,7 +436,7 @@ export default function AdminPage() {
             {/* Form */}
             <form action={submitProduct} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <label htmlFor='name'>
-                Name:
+                Name: 
                 <input
                   type="text"
                   id="name"
@@ -736,6 +737,10 @@ export default function AdminPage() {
               </table>
             </div>
           </div>
+          {/* Sign out button*/}
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '16px' }}>
+            <SignOutButton />
+          </div>
         </div>
       </main>
     ) : (
@@ -755,5 +760,6 @@ export default function AdminPage() {
           </div>
         </div>
       </main>
-    );
+    )
+    ;
 }

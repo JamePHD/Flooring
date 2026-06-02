@@ -104,6 +104,7 @@ export default function SignInPage() {
             <div style={{ maxWidth: '400px', margin: '40px auto', padding: '0 16px' }}>
                 <div style={{
                     border: '1px solid #e5e7eb',
+                    color: '#000000',
                     borderRadius: '8px',
                     overflow: 'hidden',
                     padding: '16px'}}>
