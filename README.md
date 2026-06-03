@@ -1,6 +1,6 @@
-# IoTBay Flooring Platform
+# Empirical Flooring Comparison Platform
 
-IoTBay Flooring is a Next.js web application for browsing flooring products, comparing product options, requesting quotes, and managing product catalogue data through an admin area.
+The Empirical Flooring comparison platform is a Next.js web application for browsing flooring products, comparing product options, requesting quotes, and managing product catalogue data through an admin area.
 
 The project uses Next.js, React, TypeScript, Tailwind CSS, Supabase, and Resend. Supabase provides authentication and database storage, while Resend is used to email quote requests to the sales team.
 
