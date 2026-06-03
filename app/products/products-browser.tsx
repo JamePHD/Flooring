@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
@@ -207,12 +208,13 @@ export default function ProductsBrowser({
                 key={product.id}
                 className="overflow-hidden border border-gray-200 bg-white"
               >
-                <div className="aspect-[4/3] bg-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="aspect-[4/3] bg-gray-100 relative">
+                  <Image
                     src={product.imageUrl || '/images/flooringplaceholder.jpg'}
                     alt={product.name}
-                    className="h-full w-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 </div>
                 <div className="flex min-h-52 flex-col gap-3 p-5">
