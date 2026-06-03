@@ -55,6 +55,13 @@ export default function Header() {
             >
               Get a Quote
             </Link>
+
+            <Link
+              href="/signIn"
+              className="bg-indigo-800 hover:bg-indigo-900 text-white text-sm px-4 py-2 rounded-md transition"
+            >
+              Staff Login
+            </Link>
           </div>
         </div>
       </div>
