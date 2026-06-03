@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductActions from "./product-actions";
@@ -104,23 +105,25 @@ export default async function ProductDrilldownPage({
 
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div className="space-y-4">
-          <div className="aspect-[4/3] overflow-hidden bg-gray-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
+            <Image
               src={images[0]}
               alt={product.name}
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             {images.slice(0, 3).map((image, index) => (
-              <div key={`${image}-${index}`} className="aspect-[4/3] overflow-hidden bg-gray-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              <div key={`${image}-${index}`} className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
+                <Image
                   src={image}
                   alt={`${product.name} preview ${index + 1}`}
-                  className="h-full w-full object-cover"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
               </div>
             ))}
@@ -225,12 +228,13 @@ export default async function ProductDrilldownPage({
                   href={`/products/${related.slug}`}
                   className="group border border-gray-200 bg-white transition hover:border-[#15C4C4]"
                 >
-                  <div className="aspect-[4/3] bg-gray-100">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="aspect-[4/3] bg-gray-100 relative">
+                    <Image
                       src={related.image_url || "/images/flooringplaceholder.jpg"}
                       alt={related.name}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   </div>
                   <div className="p-4">
