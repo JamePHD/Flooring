@@ -135,7 +135,10 @@ export default function ProductActions({
 
         <button
           type="button"
-          onClick={addToCompare}
+          onClick={() => {
+            addToCompare();
+            window.location.href = "/compare";
+          }}
           className="inline-flex h-12 items-center justify-center border border-[#0B6A6A] px-8 text-sm font-bold text-[#0B6A6A] transition hover:border-[#109494] hover:text-[#109494]"
         >
           Add to Compare
